@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en" class="bg-green-50">
+<head>
+  <meta charset="UTF-8" />
+  <title>Color Sorting Game</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .dragging {
+      opacity: 0.5;
+    }
+    .bin {
+      min-height: 120px;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-8">
+  <div class="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-4xl text-center border-4 border-green-200">
+    <h1 class="text-3xl font-bold mb-4 text-green-700">🎨 Color Sorting Game</h1>
+    <p class="mb-6 text-lg text-gray-700">Drag each fruit into the correct color bin!</p>
+
+    <!-- Items -->
+    <div id="items" class="flex flex-wrap justify-center gap-4 mb-8">
+      <!-- Items will be created by JS -->
+    </div>
+
+    <!-- Bins -->
+    <div class="grid grid-cols-3 gap-6">
+      <div class="bin-area">
+        <h2 class="font-bold text-red-600 mb-2">🔴 Red Bin</h2>
+        <div id="redBin" class="bin p-4 bg-red-100 rounded-lg shadow-inner flex flex-col gap-2"></div>
+      </div>
+      <div class="bin-area">
+        <h2 class="font-bold text-yellow-600 mb-2">🟡 Yellow Bin</h2>
+        <div id="yellowBin" class="bin p-4 bg-yellow-100 rounded-lg shadow-inner flex flex-col gap-2"></div>
+      </div>
+      <div class="bin-area">
+        <h2 class="font-bold text-blue-600 mb-2">🔵 Blue Bin</h2>
+        <div id="blueBin" class="bin p-4 bg-blue-100 rounded-lg shadow-inner flex flex-col gap-2"></div>
+      </div>
+    </div>
+
+    <button id="checkBtn" class="mt-6 px-6 py-3 bg-green-500 text-white rounded-full shadow hover:bg-green-600 active:scale-95 transition">Check Answer ✅</button>
+
+    <p id="feedback" class="mt-4 text-2xl font-bold"></p>
+  </div>
+
+  <script>
+    const itemsData = [
+      { emoji: "🍎", color: "red" },
+      { emoji: "🍒", color: "red" },
+      { emoji: "🍋", color: "yellow" },
+      { emoji: "🍌", color: "yellow" },
+      { emoji: "🫐", color: "blue" },
+      { emoji: "🔵", color: "blue" }
+    ];
+
+    const itemsContainer = document.getElementById('items');
+    const redBin = document.getElementById('redBin');
+    const yellowBin = document.getElementById('yellowBin');
+    const blueBin = document.getElementById('blueBin');
+    const feedback = document.getElementById('feedback');
+    const checkBtn = document.getElementById('checkBtn');
+
+    // Shuffle items
+    let items = [...itemsData].sort(() => Math.random() - 0.5);
+
+    // Render items
+    items.forEach((item, index) => {
+      const div = document.createElement('div');
+      div.textContent = item.emoji;
+      div.className = 'cursor-grab text-3xl inline-block p-4 bg-white border border-gray-300 rounded-full shadow';
+      div.setAttribute('draggable', true);
+      div.dataset.color = item.color;
+
+      div.addEventListener('dragstart', () => div.classList.add('dragging'));
+      div.addEventListener('dragend', () => div.classList.remove('dragging'));
+
+      itemsContainer.appendChild(div);
+    });
+
+    const bins = [redBin, yellowBin, blueBin];
+
+    bins.forEach(bin => {
+      bin.addEventListener('dragover', (e) => {
+        e.preventDefault();
+      });
+      bin.addEventListener('drop', () => {
+        const dragging = document.querySelector('.dragging');
+        if (dragging) bin.appendChild(dragging);
+      });
+    });
+
+    checkBtn.addEventListener('click', () => {
+      let correct = true;
+
+      redBin.querySelectorAll('div').forEach(item => {
+        if (item.dataset.color !== 'red') correct = false;
+      });
+      yellowBin.querySelectorAll('div').forEach(item => {
+        if (item.dataset.color !== 'yellow') correct = false;
+      });
+      blueBin.querySelectorAll('div').forEach(item => {
+        if (item.dataset.color !== 'blue') correct = false;
+      });
+
+      feedback.textContent = correct
+        ? "✅ Perfect! All colors sorted correctly!"
+        : "❌ Oops! Check the colors again!";
+    });
+  </script>
+</body>
+</html>

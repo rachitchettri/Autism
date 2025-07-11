@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en" class="bg-green-50">
+<head>
+  <meta charset="UTF-8" />
+  <title>Sensory Scavenger Hunt</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen flex items-center justify-center p-8">
+  <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-lg text-center">
+    <h1 class="text-2xl font-bold mb-4 text-green-700">Sensory Scavenger Hunt</h1>
+
+    <div id="item" class="mb-4">
+      <p class="text-lg font-medium mb-2" id="item-text"></p>
+    </div>
+
+    <!-- Local video player, no controls, autoplay, loop, muted -->
+    <div id="video-container" class="mb-4">
+      <video id="item-video" class="mx-auto rounded shadow" width="400" height="225" autoplay muted loop>
+        <source src="" type="video/mp4" />
+        Your browser does not support the video tag.
+      </video>
+    </div>
+
+    <div id="senses" class="flex flex-wrap justify-center gap-4 mb-4">
+      <button class="sense px-4 py-2 bg-green-500 text-white rounded shadow" data-sense="Touch">Touch</button>
+      <button class="sense px-4 py-2 bg-green-500 text-white rounded shadow" data-sense="Sound">Sound</button>
+      <button class="sense px-4 py-2 bg-green-500 text-white rounded shadow" data-sense="Sight">Sight</button>
+      <button class="sense px-4 py-2 bg-green-500 text-white rounded shadow" data-sense="Taste">Taste</button>
+      <button class="sense px-4 py-2 bg-green-500 text-white rounded shadow" data-sense="Smell">Smell</button>
+    </div>
+
+    <p id="result" class="mt-4 text-xl font-bold"></p>
+    <p id="score" class="mt-2 text-green-700 font-semibold"></p>
+
+  </div>
+
+  <script>
+    const items = [
+      { 
+        name: '🧸 Soft Teddy Bear', 
+        sense: 'Touch',
+        video: 'videos/teddy.mp4'
+      },
+      { 
+        name: '🔔 Ringing Bell', 
+        sense: 'Sound',
+        video: 'videos/bell.mp4'
+      },
+      { 
+        name: '🌈 Rainbow', 
+        sense: 'Sight',
+        video: 'videos/rainbow.mp4'
+      },
+      { 
+        name: '🍫 Chocolate',
+        sense: 'Taste',
+        video: 'videos/chocolate.mp4'
+      },
+      { 
+        name: '🌹 Rose',
+        sense: 'Smell',
+        video: 'videos/rose.mp4'
+      }
+      // ➜ Add more items with your local MP4s!
+    ];
+
+    let currentIndex = 0;
+    let score = 0;
+
+    const itemText = document.getElementById('item-text');
+    const itemVideo = document.getElementById('item-video');
+    const videoSource = itemVideo.querySelector('source');
+    const result = document.getElementById('result');
+    const scoreDisplay = document.getElementById('score');
+
+    function showItem() {
+      if (currentIndex < items.length) {
+        const item = items[currentIndex];
+        itemText.textContent = item.name;
+        videoSource.src = item.video;
+        itemVideo.load();
+        result.textContent = '';
+        scoreDisplay.textContent = `Score: ${score}/${items.length}`;
+      } else {
+        itemText.textContent = '🎉 Well done! You finished all items!';
+        document.getElementById('senses').style.display = 'none';
+        document.getElementById('video-container').style.display = 'none';
+        result.textContent = `Your final score: ${score}/${items.length}`;
+      }
+    }
+
+    document.querySelectorAll('.sense').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const selected = btn.dataset.sense;
+        if (selected === items[currentIndex].sense) {
+          result.textContent = '✅ Correct!';
+          score++;
+        } else {
+          result.textContent = `❌ Oops! It was: ${items[currentIndex].sense}`;
+        }
+        currentIndex++;
+        setTimeout(showItem, 1500);
+      });
+    });
+
+    showItem();
+  </script>
+</body>
+</html>

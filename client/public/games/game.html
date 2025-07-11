@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en" class="bg-blue-50">
+<head>
+  <meta charset="UTF-8" />
+  <title>Emotion Matching Game</title>
+  <script defer src="app.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen flex items-center justify-center p-8">
+  <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-2xl text-center">
+    <h1 class="text-3xl font-bold mb-6 text-blue-700">Emotion Matching Game</h1>
+    <p class="text-gray-600 mb-4">Drag or click to match the correct emotion word to each face.</p>
+
+    <!-- Faces Grid -->
+    <div id="faces" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+      <!-- Example face -->
+      <div class="face-card border rounded-lg p-4 bg-blue-100 cursor-pointer" data-emotion="Happy">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Smiley_face.svg/1200px-Smiley_face.svg.png" alt="Happy" class="w-full h-24 object-contain mb-2">
+        <p class="font-semibold text-lg">?</p>
+      </div>
+      <div class="face-card border rounded-lg p-4 bg-blue-100 cursor-pointer" data-emotion="Sad">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/Sad_Face_Emoji.png/1200px-Sad_Face_Emoji.png" alt="Sad" class="w-full h-24 object-contain mb-2">
+        <p class="font-semibold text-lg">?</p>
+      </div>
+      <div class="face-card border rounded-lg p-4 bg-blue-100 cursor-pointer" data-emotion="Angry">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/Angry_Emoji.png/1200px-Angry_Emoji.png" alt="Angry" class="w-full h-24 object-contain mb-2">
+        <p class="font-semibold text-lg">?</p>
+      </div>
+      <div class="face-card border rounded-lg p-4 bg-blue-100 cursor-pointer" data-emotion="Surprised">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/32/Surprised_Face_Emoji.png/1200px-Surprised_Face_Emoji.png" alt="Surprised" class="w-full h-24 object-contain mb-2">
+        <p class="font-semibold text-lg">?</p>
+      </div>
+    </div>
+
+    <!-- Emotion Buttons -->
+    <div id="emotion-words" class="flex flex-wrap justify-center gap-4">
+      <button class="emotion-btn px-4 py-2 bg-green-500 text-white rounded shadow" data-word="Happy">Happy</button>
+      <button class="emotion-btn px-4 py-2 bg-green-500 text-white rounded shadow" data-word="Sad">Sad</button>
+      <button class="emotion-btn px-4 py-2 bg-green-500 text-white rounded shadow" data-word="Angry">Angry</button>
+      <button class="emotion-btn px-4 py-2 bg-green-500 text-white rounded shadow" data-word="Surprised">Surprised</button>
+    </div>
+
+    <p id="result" class="mt-6 text-xl font-bold"></p>
+  </div>
+
+  <script>
+    let selectedWord = '';
+
+    document.querySelectorAll('.emotion-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        selectedWord = btn.dataset.word;
+        document.querySelectorAll('.emotion-btn').forEach(b => b.classList.remove('bg-green-700'));
+        btn.classList.add('bg-green-700');
+      });
+    });
+
+    document.querySelectorAll('.face-card').forEach(card => {
+      card.addEventListener('click', () => {
+        if (!selectedWord) {
+          alert('Please select an emotion word first!');
+          return;
+        }
+
+        const answer = card.dataset.emotion;
+        const textElement = card.querySelector('p');
+
+        if (selectedWord === answer) {
+          textElement.textContent = selectedWord;
+          textElement.classList.add('text-green-700');
+          document.getElementById('result').textContent = 'Correct!';
+        } else {
+          document.getElementById('result').textContent = 'Try again!';
+        }
+
+        selectedWord = '';
+        document.querySelectorAll('.emotion-btn').forEach(b => b.classList.remove('bg-green-700'));
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en" class="bg-indigo-50">
+<head>
+  <meta charset="UTF-8" />
+  <title>WorkShape - Teachable Machine Version</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image"></script>
+  <style>
+    canvas {
+      border: 4px solid #4f46e5;
+      border-radius: 12px;
+      background: #fff;
+      touch-action: none;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-6">
+  <div class="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-3xl text-center border-4 border-indigo-200">
+    <h1 class="text-3xl font-bold mb-4 text-indigo-700">✏️ WorkShape: AI Recognizer</h1>
+    <p class="mb-4 text-gray-700">Draw a shape, then check it — the AI will guess and praise you!</p>
+    <canvas id="canvas" width="400" height="400" class="mb-4"></canvas>
+    <div class="flex gap-4 justify-center mb-4">
+      <button id="checkBtn" class="px-6 py-3 bg-indigo-500 text-white rounded-full shadow hover:bg-indigo-600">Check Shape ✅</button>
+      <button id="clearBtn" class="px-6 py-3 bg-gray-400 text-white rounded-full shadow hover:bg-gray-500">Clear 🔄</button>
+    </div>
+    <p id="result" class="text-2xl font-bold mt-2"></p>
+    <p id="status" class="text-green-700 font-semibold mt-2"></p>
+  </div>
+
+  <script>
+    // ✅ Replace this with your real model URL!
+    const URL = "https://teachablemachine.withgoogle.com/models/abc123/";
+
+    
+
+    let model;
+
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const statusEl = document.getElementById('status');
+
+    let drawing = false;
+
+    // Drawing logic
+    canvas.addEventListener('mousedown', startDraw);
+    canvas.addEventListener('touchstart', startDraw);
+    canvas.addEventListener('mousemove', draw);
+    canvas.addEventListener('touchmove', draw);
+    canvas.addEventListener('mouseup', endDraw);
+    canvas.addEventListener('mouseleave', endDraw);
+    canvas.addEventListener('touchend', endDraw);
+
+    function getPos(e) {
+      if (e.touches) {
+        return [
+          e.touches[0].clientX - canvas.getBoundingClientRect().left,
+          e.touches[0].clientY - canvas.getBoundingClientRect().top
+        ];
+      }
+      return [e.offsetX, e.offsetY];
+    }
+
+    function startDraw(e) {
+      drawing = true;
+      ctx.beginPath();
+      const [x, y] = getPos(e);
+      ctx.moveTo(x, y);
+    }
+
+    function draw(e) {
+      if (!drawing) return;
+      e.preventDefault();
+      const [x, y] = getPos(e);
+      ctx.lineTo(x, y);
+      ctx.strokeStyle = '#4f46e5';
+      ctx.lineWidth = 3;
+      ctx.lineCap = 'round';
+      ctx.stroke();
+    }
+
+    function endDraw() {
+      drawing = false;
+      ctx.closePath();
+    }
+
+    document.getElementById('clearBtn').onclick = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      document.getElementById('result').textContent = '';
+    };
+
+    async function loadModel() {
+      statusEl.textContent = "Loading AI model...";
+      model = await tmImage.load(URL + "model.json", URL + "metadata.json");
+      console.log("✅ Model loaded!");
+      statusEl.textContent = "✅ AI model ready!";
+    }
+
+    document.getElementById('checkBtn').onclick = async () => {
+      if (!model) {
+        alert("⏳ Please wait, model is still loading.");
+        return;
+      }
+
+      const tempImg = new Image();
+      tempImg.src = canvas.toDataURL("image/png");
+
+      tempImg.onload = async () => {
+        const prediction = await model.predict(tempImg);
+        prediction.sort((a, b) => b.probability - a.probability);
+        const best = prediction[0];
+
+        const resultText = `✅ It looks like a ${best.className}!`;
+        document.getElementById('result').textContent = resultText;
+
+        const speak = new SpeechSynthesisUtterance(`Good job! You drew a ${best.className}! Well done!`);
+        window.speechSynthesis.speak(speak);
+      };
+    };
+
+    loadModel();
+  </script>
+</body>
+</html>

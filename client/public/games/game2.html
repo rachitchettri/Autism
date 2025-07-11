@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en" class="bg-gradient-to-br from-purple-100 to-pink-100">
+<head>
+  <meta charset="UTF-8" />
+  <title>Social Story Role-Play</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen flex items-center justify-center p-6">
+  <div class="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-3xl text-center border-4 border-purple-200">
+    <h1 class="text-4xl font-bold mb-4 text-purple-700 flex justify-center items-center gap-2">
+      🎭 Social Story Role-Play 🎭
+    </h1>
+
+    <div id="progress-bar" class="w-full bg-purple-200 rounded-full h-4 mb-6">
+      <div id="progress" class="bg-purple-500 h-4 rounded-full transition-all duration-500 ease-in-out" style="width: 0%;"></div>
+    </div>
+
+    <div id="story" class="mb-8">
+      <p id="story-text" class="text-xl md:text-2xl font-semibold text-gray-800 leading-relaxed"></p>
+    </div>
+
+    <div id="choices" class="flex flex-col gap-4 mb-6">
+      <!-- Choices will go here -->
+    </div>
+
+    <p id="feedback" class="mt-4 text-2xl font-bold"></p>
+    <p id="score" class="mt-2 text-purple-800 font-semibold"></p>
+  </div>
+
+  <script>
+    const questions = [
+      {
+        story: "🍎 You’re at the supermarket and want an apple. What do you say to the shopkeeper?",
+        choices: [
+          { text: "“Excuse me, can I have an apple, please?”", answer: "correct" },
+          { text: "“Give me that apple!”", answer: "wrong" },
+          { text: "[Grab it without asking]", answer: "wrong" }
+        ]
+      },
+      {
+        story: "😬 You accidentally bump into someone. What do you do?",
+        choices: [
+          { text: "Say 'I’m sorry!'", answer: "correct" },
+          { text: "Run away fast", answer: "wrong" },
+          { text: "Laugh at them", answer: "wrong" }
+        ]
+      },
+      {
+        story: "😭 You see your friend looking sad. What could you say?",
+        choices: [
+          { text: "'Are you okay?'", answer: "correct" },
+          { text: "'Why are you crying? That’s silly.'", answer: "wrong" },
+          { text: "Ignore them", answer: "wrong" }
+        ]
+      },
+      {
+        story: "🧸 You want to play with a toy someone else is using. What should you do?",
+        choices: [
+          { text: "'Can I play with it when you’re done?'", answer: "correct" },
+          { text: "Grab it from them", answer: "wrong" },
+          { text: "Shout until they give it", answer: "wrong" }
+        ]
+      },
+      {
+        story: "🧹 Your teacher says it’s time to clean up. What do you do?",
+        choices: [
+          { text: "Help put things away", answer: "correct" },
+          { text: "Run away", answer: "wrong" },
+          { text: "Hide the toys", answer: "wrong" }
+        ]
+      },
+      {
+        story: "🎁 A friend gives you a gift. What do you say?",
+        choices: [
+          { text: "'Thank you!'", answer: "correct" },
+          { text: "Don’t say anything", answer: "wrong" },
+          { text: "Throw it away", answer: "wrong" }
+        ]
+      },
+      {
+        story: "👋 Someone says 'Hi' to you. What do you do?",
+        choices: [
+          { text: "Say 'Hi' back", answer: "correct" },
+          { text: "Ignore them", answer: "wrong" },
+          { text: "Walk away", answer: "wrong" }
+        ]
+      },
+      {
+        story: "📚 You want to ask for help with homework. What should you say?",
+        choices: [
+          { text: "'Can you help me, please?'", answer: "correct" },
+          { text: "'Do it for me!'", answer: "wrong" },
+          { text: "Sit and cry", answer: "wrong" }
+        ]
+      },
+      {
+        story: "🏀 Your friend invites you to play a game. What do you say?",
+        choices: [
+          { text: "'Yes, I’d love to!'", answer: "correct" },
+          { text: "Walk away", answer: "wrong" },
+          { text: "Say 'No!' loudly", answer: "wrong" }
+        ]
+      },
+      {
+        story: "🍽️ You need to leave the table. What do you say?",
+        choices: [
+          { text: "'May I be excused?'", answer: "correct" },
+          { text: "Leave without saying anything", answer: "wrong" },
+          { text: "Shout and run", answer: "wrong" }
+        ]
+      }
+    ];
+
+    let currentQuestion = 0;
+    let score = 0;
+
+    const storyText = document.getElementById('story-text');
+    const choicesContainer = document.getElementById('choices');
+    const feedback = document.getElementById('feedback');
+    const scoreDisplay = document.getElementById('score');
+    const progress = document.getElementById('progress');
+
+    function showQuestion() {
+      if (currentQuestion < questions.length) {
+        const q = questions[currentQuestion];
+        storyText.textContent = q.story;
+        choicesContainer.innerHTML = '';
+
+        q.choices.forEach(choice => {
+          const btn = document.createElement('button');
+          btn.className = 'choice px-6 py-4 bg-purple-500 text-white rounded-full shadow-lg hover:bg-purple-600 active:scale-95 transition-all duration-200 text-lg';
+          btn.textContent = choice.text;
+          btn.dataset.answer = choice.answer;
+          btn.addEventListener('click', handleChoice);
+          choicesContainer.appendChild(btn);
+        });
+
+        feedback.textContent = '';
+        scoreDisplay.textContent = `Progress: ${currentQuestion + 1} / ${questions.length} | Correct: ${score}`;
+        progress.style.width = `${((currentQuestion) / questions.length) * 100}%`;
+      } else {
+        storyText.textContent = "🎉 Amazing! You finished all the social stories!";
+        choicesContainer.innerHTML = '';
+        feedback.textContent = `Your final score: ${score} / ${questions.length} 🏆`;
+        progress.style.width = `100%`;
+      }
+    }
+
+    function handleChoice(e) {
+      const isCorrect = e.target.dataset.answer === 'correct';
+      feedback.textContent = isCorrect ? '✅ Great job!' : '❌ Oops! Next time!';
+      if (isCorrect) score++;
+      currentQuestion++;
+      setTimeout(showQuestion, 1200);
+    }
+
+    showQuestion();
+  </script>
+</body>
+</html>

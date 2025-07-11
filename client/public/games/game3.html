@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en" class="bg-yellow-50">
+<head>
+  <meta charset="UTF-8" />
+  <title>Daily Routine Sequencing - Drag & Drop</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .dragging {
+      opacity: 0.5;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-8">
+  <div class="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-4xl text-center border-4 border-yellow-200">
+    <h1 class="text-3xl font-bold mb-4 text-yellow-600">🧩 Daily Routine Sequencing</h1>
+    <p id="routine-title" class="mb-6 text-lg text-gray-700 font-semibold"></p>
+
+    <div class="flex flex-col md:flex-row justify-center gap-8">
+      <!-- Draggable blocks -->
+      <div>
+        <h2 class="font-bold mb-2 text-yellow-700">Steps</h2>
+        <div id="blocks" class="p-4 bg-yellow-100 rounded-lg shadow-inner flex flex-col gap-4 min-w-[200px]">
+          <!-- Blocks generated here -->
+        </div>
+      </div>
+
+      <!-- Drop stack -->
+      <div>
+        <h2 class="font-bold mb-2 text-yellow-700">Your Routine Stack</h2>
+        <div id="stack" class="p-4 bg-yellow-100 rounded-lg shadow-inner min-h-[200px] flex flex-col gap-4">
+          <p class="text-gray-500">Drop here ➡️</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex flex-wrap justify-center gap-4 mt-6">
+      <button id="checkBtn" class="px-6 py-3 bg-yellow-500 text-white rounded-full shadow hover:bg-yellow-600 active:scale-95 transition">Check Order ✅</button>
+      <button id="nextBtn" class="px-6 py-3 bg-green-500 text-white rounded-full shadow hover:bg-green-600 active:scale-95 transition hidden">Next Routine ➡️</button>
+    </div>
+
+    <p id="feedback" class="mt-4 text-xl font-bold"></p>
+  </div>
+
+  <script>
+    const routines = [
+      {
+        title: "🌞 Morning Routine",
+        steps: ["🛏️ Wake Up", "🪥 Brush Teeth", "🥣 Eat Breakfast", "🎒 Go to School"]
+      },
+      {
+        title: "🧼 Bath Time",
+        steps: ["🚿 Take Shower", "🧴 Use Soap", "🧻 Dry with Towel", "🧢 Wear Clean Clothes"]
+      },
+      {
+        title: "🍽️ Dinner Time",
+        steps: ["🍲 Sit at Table", "🍽️ Eat Dinner", "🧴 Wash Hands", "🧹 Help Clean Up"]
+      },
+      {
+        title: "🛏️ Bedtime Routine",
+        steps: ["🧴 Brush Teeth", "📖 Read Story", "💤 Go to Bed", "🌙 Sleep Tight"]
+      },
+      {
+        title: "🏠 Coming Home",
+        steps: ["🚪 Open Door", "👟 Take Off Shoes", "🧴 Wash Hands", "📚 Do Homework"]
+      }
+    ];
+
+    let currentRoutine = 0;
+
+    const routineTitle = document.getElementById('routine-title');
+    const blocksContainer = document.getElementById('blocks');
+    const stackContainer = document.getElementById('stack');
+    const feedback = document.getElementById('feedback');
+    const checkBtn = document.getElementById('checkBtn');
+    const nextBtn = document.getElementById('nextBtn');
+
+    function setupRoutine() {
+      const routine = routines[currentRoutine];
+      routineTitle.textContent = routine.title;
+
+      // Reset containers
+      blocksContainer.innerHTML = '';
+      stackContainer.innerHTML = '<p class="text-gray-500">Drop here ➡️</p>';
+      feedback.textContent = '';
+      nextBtn.classList.add('hidden');
+
+      // Shuffle blocks
+      let blocks = [...routine.steps].sort(() => Math.random() - 0.5);
+
+      blocks.forEach(step => {
+        const block = document.createElement('div');
+        block.textContent = step;
+        block.className = 'cursor-grab px-4 py-4 bg-yellow-400 text-yellow-900 font-bold rounded-xl shadow';
+        block.setAttribute('draggable', true);
+
+        block.addEventListener('dragstart', () => {
+          block.classList.add('dragging');
+        });
+
+        block.addEventListener('dragend', () => {
+          block.classList.remove('dragging');
+        });
+
+        blocksContainer.appendChild(block);
+      });
+    }
+
+    stackContainer.addEventListener('dragover', (e) => {
+      e.preventDefault();
+    });
+
+    stackContainer.addEventListener('drop', (e) => {
+      e.preventDefault();
+      const dragging = document.querySelector('.dragging');
+      if (dragging && !stackContainer.contains(dragging)) {
+        if (stackContainer.querySelector('p')) {
+          stackContainer.querySelector('p').remove();
+        }
+        stackContainer.appendChild(dragging);
+      }
+    });
+
+    checkBtn.addEventListener('click', () => {
+      const userBlocks = stackContainer.querySelectorAll('div');
+      let userOrder = [];
+      userBlocks.forEach(block => {
+        userOrder.push(block.textContent);
+      });
+
+      const routine = routines[currentRoutine];
+      let isCorrect = true;
+      if (userOrder.length !== routine.steps.length) {
+        isCorrect = false;
+      } else {
+        for (let i = 0; i < routine.steps.length; i++) {
+          if (userOrder[i] !== routine.steps[i]) {
+            isCorrect = false;
+            break;
+          }
+        }
+      }
+
+      feedback.textContent = isCorrect
+        ? "✅ Great job! Well done!"
+        : "❌ Oops! Try again.";
+
+      if (isCorrect && currentRoutine < routines.length - 1) {
+        nextBtn.classList.remove('hidden');
+      }
+    });
+
+    nextBtn.addEventListener('click', () => {
+      currentRoutine++;
+      setupRoutine();
+    });
+
+    setupRoutine();
+  </script>
+</body>
+</html>
