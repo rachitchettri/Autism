@@ -1,38 +1,35 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
 
-const UserSchema = new mongoose.Schema(
-  {
-    name: {
-      type: String,
-      required: [true, 'Name is required'],
-      trim: true
-    },
-    email: {
-      type: String,
-      required: [true, 'Email is required'],
-      unique: true,
-      lowercase: true,
-      trim: true
-    },
-    password: {
-      type: String,
-      required: [true, 'Password is required']
-    },
-    role: {
-      type: String,
-      enum: ['parent', 'kid', 'organization'],
-      required: [true, 'Role is required']
-    },
-    childProfile: {
-      name: { type: String, default: '' },
-      age: { type: Number, min: 1, max: 18, default: null }
-    },
-    organizationProfile: {
-      orgName: { type: String, default: '' },
-      orgAddress: { type: String, default: '' }
-    }
-  },
-  { timestamps: true }
-);
+const userSchema = new mongoose.Schema({
+  role: { type: String, enum: ['parent', 'organization'], required: true },
 
-module.exports = mongoose.models.User || mongoose.model('User', UserSchema);
+  // Organization only
+  org_name: { type: String },
+
+  // Parent only
+  f_name: { type: String },
+  l_name: { type: String },
+  age: { type: Number },
+  gender: { type: String, enum: ['male', 'female', 'other'] },
+
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+
+  // kidId, organizationId fields removed for now, to be used later
+});
+
+
+
+// Password hashing
+userSchema.pre('save', async function (next) {
+  if (!this.isModified('password')) return next();
+  this.password = await bcrypt.hash(this.password, 10);
+  next();
+});
+
+userSchema.methods.matchPassword = async function (enteredPassword) {
+  return await bcrypt.compare(enteredPassword, this.password);
+};
+
+module.exports = mongoose.model('User', userSchema);
