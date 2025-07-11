@@ -17,7 +17,7 @@ export default function Dashboard() {
   if (loading) return <p className="p-4">Loading...</p>;
   if (error) return <p className="p-4 text-red-600">Error: {error}</p>;
 
-  // Safely handle empty or unsorted records
+
   const sortedRecords = [...records].sort((a, b) =>
     new Date(a.createdAt) - new Date(b.createdAt)
   );
@@ -39,7 +39,7 @@ export default function Dashboard() {
         data: scores,
         fill: false,
         borderColor: 'rgb(75, 192, 192)',
-        tension: 0.1, // smoother line
+        tension: 0.1, 
       },
     ],
   };

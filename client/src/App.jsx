@@ -7,6 +7,8 @@ import Dashboard from './components/Dashboard';
 import GamesLibrary from './components/GameLibrary';
 import Community from './pages/Community';
 import AdminPanel from './pages/AdminPanel';
+import Scores from './components/gamescore';
+import Profile from './pages/Register/OnboardingPage';
 
 // Example auth check — replace with your real logic!
 const isAuthenticated = () => {
@@ -20,9 +22,10 @@ function PrivateRoute({ children }) {
 export default function App() {
   return (
     <BrowserRouter>
-      <Navbar />
+     
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path='/profile' element={<Profile />} />
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
 
@@ -59,7 +62,16 @@ export default function App() {
             </PrivateRoute>
           }
         />
+         <Route
+          path="/score"
+          element={
+            <PrivateRoute>
+              <Scores />
+            </PrivateRoute>
+          }
+        />
       </Routes>
+      
     </BrowserRouter>
   );
 }
