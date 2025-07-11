@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
+import Image1 from '../../assets/pngegg 1.png';
+import Image from '../../assets/Group 3.png';
 
 const ChildRegistrationForm = () => {
   const [formData, setFormData] = useState({
@@ -7,195 +9,145 @@ const ChildRegistrationForm = () => {
     lastName: '',
     age: '',
     gender: '',
-    language: ''
+    language: '', // Ensure this is part of your state if you plan to add the language field
   });
 
   const handleInputChange = (field, value) => {
     setFormData(prev => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
   const handleNext = () => {
     console.log('Form data:', formData);
-    // Handle form submission or navigation to next step
+    // Add your next step logic here
   };
 
   return (
-    <div className="relative w-full max-w-[2480px] mx-auto bg-white max-h-screen">
-      {/* Navigation Bar */}
-      <div className="absolute top-0 left-0 right-0 h-16 bg-white">
-        <div className="absolute left-20 top-4">
-          <span className="font-poppins font-semibold text-xl text-black tracking-tight">
-            LOGO
-          </span>
-        </div>
-      </div>
+    <div className="min-h-screen w-full bg-white flex flex-col font-poppins">
+      {/* Navbar */}
+      <nav className="fixed top-0 left-0 w-full h-16 bg-white shadow-sm z-20 flex items-center px-8">
+        <span className="text-xl font-semibold text-black">LOGO</span>
+      </nav>
 
-      {/* Header Section */}
-      <div className="absolute top-16 left-0 right-0 h-40 bg-gradient-to-r from-blue-400 to-blue-800">
-        <div className="absolute left-36 top-7 w-[632px]">
-          <h1 className="font-poppins font-semibold text-5xl leading-[72px] text-white mb-2">
-            Let's Get Started
-          </h1>
-          <p className="font-poppins font-semibold text-xl text-blue-200 tracking-[0.26em]">
-            HELP US GET TO KNOW THE CHILD
+      {/* Header */}
+      <header className="pt-16 w-full bg-gradient-to-r from-[#60BC64] to-[#10723A] py-12 px-8 flex flex-col md:flex-row items-center justify-between">
+        <div className="text-center md:text-left">
+          <h1 className="text-4xl md:text-5xl font-bold text-white">Let’s Get Started</h1>
+          <p className="text-[#D3FFD6] mt-2 uppercase tracking-wider font-medium text-sm md:text-base">
+            Help us get to know the child
           </p>
         </div>
-      </div>
-
-      {/* Step Indicator */}
-      <div className="absolute left-12 top-96">
-        <div className="flex flex-col items-center space-y-4">
-          {/* Step 1 - Active */}
-          <div className="flex flex-col items-center">
-            <div className="w-8 h-8 rounded-full bg-green-500 border-2 border-green-500 flex items-center justify-center">
-              <span className="text-white font-poppins font-medium text-xs">1</span>
-            </div>
-            <div className="w-0.5 h-10 bg-gray-200 mt-2"></div>
-          </div>
-          
-          {/* Step 2 - Inactive */}
-          <div className="flex flex-col items-center">
-            <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
-              <span className="text-black font-poppins font-medium text-xs">2</span>
-            </div>
-            <div className="w-0.5 h-10 bg-gray-200 mt-2"></div>
-          </div>
-          
-          {/* Step 3 - Inactive */}
-          <div className="flex flex-col items-center">
-            <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
-              <span className="text-black font-poppins font-medium text-xs">3</span>
-            </div>
-          </div>
+        <div className="mt-8 md:mt-0">
+          <img src={Image1} alt="Illustration" className="w-64 md:w-80 object-contain" />
         </div>
-      </div>
+      </header>
 
-      {/* Illustration Section */}
-      <div className="absolute left-60 top-96 w-80 h-72">
-        <div className="relative">
-          {/* Background shapes */}
-          <div className="absolute left-4 top-32 w-44 h-20 bg-gray-300 rounded-lg"></div>
-          <div className="absolute left-28 top-16 w-44 h-36 bg-gray-300 rounded-lg"></div>
-          <div className="absolute left-52 top-0 w-28 h-56 bg-gray-300 rounded-lg"></div>
-          
-          {/* Character placeholder */}
-          <div className="absolute left-8 top-8 w-16 h-28 bg-orange-400 rounded-lg flex items-center justify-center">
-            <div className="w-12 h-12 bg-orange-600 rounded-full"></div>
-          </div>
-        </div>
-        
-        <p className="absolute bottom-0 left-0 right-0 text-center text-gray-500 font-poppins text-xs">
-          We use this info to personalize the app for the child's age and language.
-        </p>
-      </div>
-
-      {/* Vertical Divider */}
-      <div className="absolute left-[640px] top-72 w-1 h-[433px] bg-gray-200"></div>
-
-      {/* Form Section */}
-      <div className="absolute right-16 top-80 w-[500px]">
-        <div className="mb-8">
-          <h2 className="font-poppins font-semibold text-3xl text-gray-600 mb-2">
-            🧠 Basic Information
-          </h2>
-        </div>
-
-        <div className="space-y-6">
-          {/* Name Fields */}
-          <div className="flex gap-4">
-            <div className="flex-1">
-              <label className="block font-poppins font-semibold text-xs text-gray-500 mb-2 tracking-tight">
-                FIRST NAME
-              </label>
-              <input
-                type="text"
-                value={formData.firstName}
-                onChange={(e) => handleInputChange('firstName', e.target.value)}
-                className="w-full h-11 px-3 bg-gray-100 border border-blue-500 rounded-lg font-poppins text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-              />
-            </div>
-            <div className="flex-1">
-              <label className="block font-poppins font-semibold text-xs text-gray-500 mb-2 tracking-tight">
-                LAST NAME
-              </label>
-              <input
-                type="text"
-                value={formData.lastName}
-                onChange={(e) => handleInputChange('lastName', e.target.value)}
-                className="w-full h-11 px-3 bg-gray-100 border border-gray-300 rounded-lg font-poppins text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-              />
-            </div>
-          </div>
-
-          {/* Age, Gender, Language Fields */}
-          <div className="flex gap-4">
-            <div className="w-20">
-              <label className="block font-poppins font-semibold text-xs text-gray-500 mb-2 tracking-tight">
-                AGE
-              </label>
-              <input
-                type="number"
-                value={formData.age}
-                onChange={(e) => handleInputChange('age', e.target.value)}
-                className="w-full h-11 px-3 bg-gray-100 border border-gray-300 rounded-lg font-poppins text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-              />
-            </div>
-            
-            <div className="w-32">
-              <label className="block font-poppins font-semibold text-xs text-gray-500 mb-2 tracking-tight">
-                GENDER
-              </label>
-              <div className="relative">
-                <select
-                  value={formData.gender}
-                  onChange={(e) => handleInputChange('gender', e.target.value)}
-                  className="w-full h-11 px-3 bg-gray-100 border border-gray-300 rounded-lg font-poppins text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 appearance-none"
-                >
-                  <option value="">Select</option>
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
-                  <option value="other">Other</option>
-                </select>
-                <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-600 pointer-events-none" />
+      {/* Main Content */}
+      <main className="flex flex-col md:flex-row max-w-7xl mx-auto px-8 py-16 gap-12">
+        {/* Steps */}
+        <div className="hidden md:flex flex-col items-center space-y-4">
+          {[1, 2, 3].map(step => (
+            <React.Fragment key={step}>
+              <div
+                className={`w-8 h-8 rounded-full flex items-center justify-center border-2 text-xs font-semibold ${
+                  step === 1
+                    ? 'bg-green-500 border-green-500 text-white'
+                    : 'bg-gray-200 border-gray-300 text-black'
+                }`}
+              >
+                {step}
               </div>
-            </div>
-            
-            <div className="flex-1">
-              <label className="block font-poppins font-semibold text-xs text-gray-500 mb-2 tracking-tight">
-                LANGUAGE
-              </label>
-              <div className="relative">
-                <select
-                  value={formData.language}
-                  onChange={(e) => handleInputChange('language', e.target.value)}
-                  className="w-full h-11 px-3 bg-gray-100 border border-gray-300 rounded-lg font-poppins text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 appearance-none"
-                >
-                  <option value="">Select Language</option>
-                  <option value="english">English</option>
-                  <option value="spanish">Spanish</option>
-                  <option value="french">French</option>
-                  <option value="german">German</option>
-                  <option value="chinese">Chinese</option>
-                </select>
-                <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-600 pointer-events-none" />
-              </div>
-            </div>
-          </div>
+              {step !== 3 && <div className="w-px h-10 bg-gray-300"></div>}
+            </React.Fragment>
+          ))}
+        </div>
 
-          {/* Next Button */}
-          <div className="pt-6">
-            <button
-              onClick={handleNext}
-              className="w-full h-11 bg-green-500 hover:bg-green-600 text-white font-poppins font-semibold text-sm rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-400"
-            >
-              NEXT
-            </button>
+        {/* Left Visual */}
+        <div className="flex-1 flex flex-col items-center md:items-start gap-8">
+          <div className="flex justify-center md:justify-start">
+            <img src={Image} alt="Learning Visual" className="w-72 md:w-96 object-contain" />
+          </div>
+          
+        </div>
+
+        {/* Divider */}
+        <div className="hidden md:block w-px bg-gray-300"></div>
+
+        {/* Form */}
+        <div className="flex-1 max-w-md w-full">
+          <div className="bg-gray-50 border border-gray-200 shadow rounded-xl p-8">
+            <h2 className="text-2xl md:text-3xl font-semibold text-gray-700 mb-8">
+              🧠 Basic Information
+            </h2>
+
+            <div className="space-y-6">
+              {/* First and Last Name */}
+              <div className="flex flex-col md:flex-row gap-4">
+                <div className="flex-1">
+                  <label className="block text-xs font-medium text-gray-600 mb-1">First Name</label>
+                  <input
+                    type="text"
+                    value={formData.firstName}
+                    onChange={e => handleInputChange('firstName', e.target.value)}
+                    placeholder="Enter first name"
+                    className="w-full h-11 px-3 bg-white border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-green-400"
+                  />
+                </div>
+                <div className="flex-1">
+                  <label className="block text-xs font-medium text-gray-600 mb-1">Last Name</label>
+                  <input
+                    type="text"
+                    value={formData.lastName}
+                    onChange={e => handleInputChange('lastName', e.target.value)}
+                    placeholder="Enter last name"
+                    className="w-full h-11 px-3 bg-white border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-green-400"
+                  />
+                </div>
+              </div>
+
+              {/* Age, Gender */}
+              <div className="flex flex-col md:flex-row gap-4"> {/* Changed gap-16 to gap-4 */}
+                <div className="flex-1"> {/* Changed w-full md:w-20 to flex-1 */}
+                  <label className="block text-xs font-medium text-gray-600 mb-1">Age</label>
+                  <input
+                    type="number"
+                    value={formData.age}
+                    onChange={e => handleInputChange('age', e.target.value)}
+                    placeholder="Age"
+                    className="w-full h-11 px-3 bg-white border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-green-400"
+                  />
+                </div>
+
+                <div className="flex-1 relative"> {/* Changed w-full md:w-32 to flex-1 */}
+                  <label className="block text-xs font-medium text-gray-600 mb-1">Gender</label>
+                  <select
+                    value={formData.gender}
+                    onChange={e => handleInputChange('gender', e.target.value)}
+                    className="w-full h-11 px-3 bg-white border border-gray-300 rounded-md text-sm appearance-none focus:outline-none focus:ring-2 focus:ring-green-400"
+                  >
+                    <option value="">Select</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Other</option>
+                  </select>
+                  <ChevronDown className="absolute right-3 top-9 transform -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
+                </div>
+                {/* You had an empty div here, removing it to streamline */}
+              </div>
+
+              {/* Next Button */}
+              <button
+                onClick={handleNext}
+                className="w-full h-11 bg-green-600 hover:bg-green-700 text-white font-medium rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-400 mt-4"
+              >
+                Next
+              </button>
+            </div>
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 };

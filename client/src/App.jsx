@@ -9,7 +9,8 @@ import Community from './pages/Community';
 import AdminPanel from './pages/AdminPanel';
 import Scores from './components/gamescore';
 import Profile from './pages/Register/OnboardingPage';
-
+import Profile1 from './pages/Register/learningFocus';
+import Profile2  from './pages/Register/lastreg';
 // Example auth check — replace with your real logic!
 const isAuthenticated = () => {
   return !!localStorage.getItem('token'); // or your auth state
@@ -26,6 +27,8 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path='/profile' element={<Profile />} />
+        <Route path='/profile1' element={<Profile1 />} />
+        <Route path='/profile2' element={<Profile2 />} />
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
 
