@@ -1,38 +1,19 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const cors = require('cors');
-
-// ✅ Hardcoded Mongo URI & JWT secret
-const MONGO_URI = 'mongodb+srv://rachitdatabase:Y9dkoWtik3aMqkJx@mern-admin.q6jrrbp.mongodb.net/?retryWrites=true&w=majority';
-global.JWT_SECRET = 'YourSuperSecretKey';
-
+const dotenv = require('dotenv');
 const authRoutes = require('./routes/auth');
-const gameRoutes = require('./routes/games');
-const quoteRoutes = require('./routes/quotes');
 
+dotenv.config();
 const app = express();
-app.use(cors());
 app.use(express.json());
 
-// ✅ Mount your routes
+// Connect MongoDB
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => console.log('MongoDB connected'))
+  .catch(err => console.error('MongoDB error:', err));
+
+// Routes
 app.use('/api/auth', authRoutes);
-app.use('/api/games', gameRoutes);
-app.use('/api/quotes', quoteRoutes);
 
-// ✅ Connect to MongoDB — using the variable!
-async function connectDB() {
-  try {
-    const conn = await mongoose.connect(MONGO_URI);
-    console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
-  } catch (err) {
-    console.error(`❌ MongoDB connection failed:`, err.message);
-    process.exit(1);
-  }
-  
-}
-
-connectDB();
-
-// ✅ Start server
-const PORT = 5000;
-app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

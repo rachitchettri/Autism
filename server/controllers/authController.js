@@ -1,87 +1,127 @@
 const User = require('../models/User');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
+const generateToken = require('../utils/generateToken');
 
-// ✅ Register controller — multi-role
-exports.register = async (req, res) => {
-  const { name, email, password, role, childName, childAge, orgName, orgAddress } = req.body;
-
+const registerUser = async (req, res) => {
   try {
-    // Basic validation
-    if (!name || !email || !password || !role) {
-      return res.status(400).json({ error: 'Name, email, password, and role are required.' });
-    }
-
-    if (!['parent', 'kid', 'organization'].includes(role)) {
-      return res.status(400).json({ error: 'Invalid role specified.' });
-    }
-
-    // Check for existing user
-    const existing = await User.findOne({ email });
-    if (existing) {
-      return res.status(409).json({ error: 'User with this email already exists.' });
-    }
-
-    // Hash password
-    const hashed = await bcrypt.hash(password, 10);
-
-    // Build user object
-    const user = new User({
-      name,
-      email,
-      password: hashed,
+    const {
+      f_name,
+      l_name,
+      age,
+      gender,
       role,
-      childProfile: role === 'parent' ? { name: childName || '', age: childAge || null } : undefined,
-      organizationProfile: role === 'organization' ? { orgName: orgName || '', orgAddress: orgAddress || '' } : undefined
-    });
+      org_name,
+      email,
+      password,
+      confirmPassword,
+      kidId,          // no longer needed at registration
+      organizationId  // no longer needed at registration
+    } = req.body;
 
-    await user.save();
-
-    res.status(201).json({ message: '✅ User registered successfully!' });
-  } catch (err) {
-    console.error('Register error:', err);
-    res.status(500).json({ error: 'Something went wrong during registration.' });
-  }
-};
-
-// ✅ Login controller — multi-role aware
-exports.login = async (req, res) => {
-  const { email, password } = req.body;
-
-  try {
-    if (!email || !password) {
-      return res.status(400).json({ error: 'Email and password are required.' });
+    // Validate role only parent or organization
+    if (!role || !['parent', 'organization'].includes(role)) {
+      return res.status(400).json({ message: 'Role must be either parent or organization.' });
     }
 
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(404).json({ error: 'No user found with this email.' });
+    // Common required fields
+    if (!email || !password || !confirmPassword) {
+      return res.status(400).json({ message: 'Email, password and confirm password are required.' });
     }
 
-    const match = await bcrypt.compare(password, user.password);
-    if (!match) {
-      return res.status(401).json({ error: 'Incorrect password.' });
+    if (password !== confirmPassword) {
+      return res.status(400).json({ message: 'Passwords do not match.' });
     }
 
-    const token = jwt.sign(
-      { id: user._id, role: user.role },
-      global.JWT_SECRET || 'secret',
-      { expiresIn: '7d' }
-    );
+    // Validate fields depending on role
+    if (role === 'organization') {
+      if (!org_name) {
+        return res.status(400).json({ message: 'Organization name is required.' });
+      }
+    } else if (role === 'parent') {
+      if (!f_name || !l_name || !gender) {
+        return res.status(400).json({ message: 'First name, last name, and gender are required for parent.' });
+      }
+    }
 
-    res.json({
-      token,
+    // Check if email already exists
+    const userExists = await User.findOne({ email });
+    if (userExists) {
+      return res.status(400).json({ message: 'User already exists with this email.' });
+    }
+
+    // Prepare new user data
+    const newUserData = {
+      role,
+      email,
+      password,
+    };
+
+    if (role === 'organization') {
+      newUserData.org_name = org_name;
+    } else if (role === 'parent') {
+      newUserData.f_name = f_name;
+      newUserData.l_name = l_name;
+      newUserData.age = age;
+      newUserData.gender = gender;
+    }
+
+    const newUser = new User(newUserData);
+    await newUser.save();
+
+    res.status(201).json({
+      message: 'User registered successfully.',
       user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        childProfile: user.childProfile,
-        organizationProfile: user.organizationProfile
+        id: newUser._id,
+        role: newUser.role,
+        email: newUser.email,
+        ...(role === 'organization' ? { org_name: newUser.org_name } : {
+          f_name: newUser.f_name,
+          l_name: newUser.l_name
+        })
       }
     });
-  } catch (err) {
-    console.error('Login error:', err);
-    res.status(500).json({ error: 'Something went wrong during login.' });
+  } catch (error) {
+    console.error('Registration Error:', error);
+    res.status(500).json({ message: 'Server error during registration.' });
   }
 };
+
+
+
+const loginUser = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    // Check email & password are provided
+    if (!email || !password)
+      return res.status(400).json({ message: 'Email and password are required.' });
+
+    // Find user
+    const user = await User.findOne({ email });
+    if (!user)
+      return res.status(401).json({ message: 'Invalid credentials.' });
+
+    // Compare password
+    const isMatch = await user.matchPassword(password);
+    if (!isMatch)
+      return res.status(401).json({ message: 'Invalid credentials.' });
+
+    // Success
+    res.status(200).json({
+      message: 'Login successful',
+      token: generateToken(user._id),
+      user: {
+        id: user._id,
+        f_name: user.f_name,
+        l_name: user.l_name,
+        email: user.email,
+        role: user.role
+      }
+    });
+  } catch (error) {
+    console.error('Login Error:', error);
+    res.status(500).json({ message: 'Server error during login.' });
+  }
+};
+
+module.exports = { registerUser, loginUser };
+
