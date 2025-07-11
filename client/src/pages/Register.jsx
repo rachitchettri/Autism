@@ -1,20 +1,20 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { register } from '../api';
+import SignUpImage from '../assets/P.png';
 
-export default function Register() {
+export default function SignUp() {
+  const navigate = useNavigate();
   const [form, setForm] = useState({
-    name: '',
+    orgName: '',
     email: '',
     password: '',
-    role: 'parent',
-    childName: '',
-    childAge: '',
-    orgName: '',
-    orgAddress: ''
+    remember: false,
   });
 
   const handleChange = e => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value, type, checked } = e.target;
+    setForm({ ...form, [name]: type === 'checkbox' ? checked : value });
   };
 
   const handleSubmit = async e => {
@@ -22,6 +22,7 @@ export default function Register() {
     try {
       const res = await register(form);
       alert(res.data.message);
+      navigate('/dashboard'); // Optional redirect
     } catch (err) {
       console.error(err);
       alert(err.response?.data?.error || 'Registration failed.');
@@ -29,121 +30,101 @@ export default function Register() {
   };
 
   return (
-    <div className="max-w-md mx-auto mt-12 p-6 bg-white rounded shadow">
-      <h2 className="text-2xl font-bold mb-4 text-center text-blue-600">Create Account</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="block mb-1 text-sm">Name</label>
-          <input
-            name="name"
-            value={form.name}
-            onChange={handleChange}
-            className="border border-gray-300 px-4 py-2 w-full rounded"
-            placeholder="Your Name"
-            required
-          />
-        </div>
+    <div className="min-h-screen flex flex-col md:flex-row font-sans">
+      {/* Left Side - Sign Up Form */}
+      <div className="flex-1 flex items-center justify-center p-8 bg-white">
+        <div className="w-full max-w-md bg-white p-8 ">
+          {/* Heading + Subheading */}
+          <div className="mb-8">
+            <h2 className="text-3xl font-bold text-gray-800 mb-2">Sign Up</h2>
+            <p className="text-gray-500 text-sm">
+              Let’s start the journey and make an impact
+            </p>
+          </div>
 
-        <div>
-          <label className="block mb-1 text-sm">Email</label>
-          <input
-            name="email"
-            type="email"
-            value={form.email}
-            onChange={handleChange}
-            className="border border-gray-300 px-4 py-2 w-full rounded"
-            placeholder="email@example.com"
-            required
-          />
-        </div>
-
-        <div>
-          <label className="block mb-1 text-sm">Password</label>
-          <input
-            name="password"
-            type="password"
-            value={form.password}
-            onChange={handleChange}
-            className="border border-gray-300 px-4 py-2 w-full rounded"
-            placeholder="••••••••"
-            required
-          />
-        </div>
-
-        <div>
-          <label className="block mb-1 text-sm">Register as:</label>
-          <select
-            name="role"
-            value={form.role}
-            onChange={handleChange}
-            className="border border-gray-300 px-4 py-2 w-full rounded"
-          >
-            <option value="parent">Parent</option>
-            <option value="kid">Kid</option>
-            <option value="organization">Organization</option>
-          </select>
-        </div>
-
-        {form.role === 'parent' && (
-          <>
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {/* Organization Name */}
             <div>
-              <label className="block mb-1 text-sm">Child Name</label>
-              <input
-                name="childName"
-                value={form.childName}
-                onChange={handleChange}
-                className="border border-gray-300 px-4 py-2 w-full rounded"
-                placeholder="Child's Name"
-              />
-            </div>
-            <div>
-              <label className="block mb-1 text-sm">Child Age</label>
-              <input
-                name="childAge"
-                type="number"
-                min="1"
-                max="18"
-                value={form.childAge}
-                onChange={handleChange}
-                className="border border-gray-300 px-4 py-2 w-full rounded"
-                placeholder="Child's Age"
-              />
-            </div>
-          </>
-        )}
-
-        {form.role === 'organization' && (
-          <>
-            <div>
-              <label className="block mb-1 text-sm">Organization Name</label>
+              <label className="block mb-1 text-xs font-semibold text-gray-700 tracking-wide">
+                Organization Name
+              </label>
               <input
                 name="orgName"
+                type="text"
                 value={form.orgName}
                 onChange={handleChange}
-                className="border border-gray-300 px-4 py-2 w-full rounded"
-                placeholder="Organization Name"
+                placeholder="Your Organization"
+                required
+                className="border border-gray-300 px-4 py-2.5 w-full rounded-lg focus:ring-2 focus:ring-green-400 focus:border-transparent transition-all duration-200"
               />
             </div>
-            <div>
-              <label className="block mb-1 text-sm">Organization Address</label>
-              <input
-                name="orgAddress"
-                value={form.orgAddress}
-                onChange={handleChange}
-                className="border border-gray-300 px-4 py-2 w-full rounded"
-                placeholder="Organization Address"
-              />
-            </div>
-          </>
-        )}
 
-        <button
-          type="submit"
-          className="w-full bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-        >
-          Register
-        </button>
-      </form>
+            {/* Email */}
+            <div>
+              <label className="block mb-1 text-xs font-semibold text-gray-700 tracking-wide">
+                Email
+              </label>
+              <input
+                name="email"
+                type="email"
+                value={form.email}
+                onChange={handleChange}
+                placeholder="mail@abc.com"
+                required
+                className="border border-gray-300 px-4 py-2.5 w-full rounded-lg focus:ring-2 focus:ring-green-400 focus:border-transparent transition-all duration-200"
+              />
+            </div>
+
+            {/* Set Password */}
+            <div>
+              <label className="block mb-1 text-xs font-semibold text-gray-700 tracking-wide">
+                Set Password
+              </label>
+              <input
+                name="password"
+                type="password"
+                value={form.password}
+                onChange={handleChange}
+                placeholder="*************"
+                required
+                className="border border-gray-300 px-4 py-2.5 w-full rounded-lg focus:ring-2 focus:ring-green-400 focus:border-transparent transition-all duration-200"
+              />
+            </div>
+
+            {/* Remember Me */}
+            <div className="flex items-center justify-between text-sm">
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  name="remember"
+                  checked={form.remember}
+                  onChange={handleChange}
+                  className="accent-green-600"
+                />
+                <span className="text-gray-700">Remember Me</span>
+              </label>
+            </div>
+
+            {/* Submit Button */}
+            <button
+              type="submit"
+              className="w-full bg-green-600 text-white px-4 py-2.5 rounded-lg font-semibold hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2 transition-all duration-200"
+            >
+              Let’s go
+            </button>
+          </form>
+        </div>
+      </div>
+
+      {/* Right Side - Image */}
+      <div className="hidden md:flex flex-1 h-full items-center justify-center bg-gray-100">
+        <img
+          src={SignUpImage}
+          alt="Sign Up Illustration"
+          className="w-full h-full object-cover"
+        />
+      </div>
     </div>
   );
 }
