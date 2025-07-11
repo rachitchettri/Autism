@@ -5,24 +5,37 @@ import SignUpImage from '../assets/P.png';
 
 export default function SignUp() {
   const navigate = useNavigate();
-  const [form, setForm] = useState({
-    orgName: '',
+
+  const [mode, setMode] = useState('organization'); // 'organization' or 'parent'
+
+  const [orgForm, setOrgForm] = useState({
     email: '',
     password: '',
     remember: false,
   });
 
-  const handleChange = e => {
+  const [parentForm, setParentForm] = useState({
+    email: '',
+    password: '',
+  });
+
+  const handleOrgChange = e => {
     const { name, value, type, checked } = e.target;
-    setForm({ ...form, [name]: type === 'checkbox' ? checked : value });
+    setOrgForm({ ...orgForm, [name]: type === 'checkbox' ? checked : value });
+  };
+
+  const handleParentChange = e => {
+    const { name, value } = e.target;
+    setParentForm({ ...parentForm, [name]: value });
   };
 
   const handleSubmit = async e => {
     e.preventDefault();
     try {
-      const res = await register(form);
+      const formToSubmit = mode === 'organization' ? orgForm : parentForm;
+      const res = await register(formToSubmit);
       alert(res.data.message);
-      navigate('/dashboard'); // Optional redirect
+      navigate('/dashboard');
     } catch (err) {
       console.error(err);
       alert(err.response?.data?.error || 'Registration failed.');
@@ -31,12 +44,38 @@ export default function SignUp() {
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row font-sans">
-      {/* Left Side - Sign Up Form */}
-      <div className="flex-1 flex items-center justify-center p-8 bg-white">
-        <div className="w-full max-w-md bg-white p-8 ">
-          {/* Heading + Subheading */}
+      {/* Left Side */}
+      <div className="flex-1 flex flex-col items-center justify-center p-8 bg-white">
+        <div className="w-full max-w-md bg-white p-8">
+          {/* Toggle */}
+          <div className="flex gap-4 mb-6">
+            <button
+              onClick={() => setMode('organization')}
+              className={`px-4 py-2 rounded-full border ${
+                mode === 'organization'
+                  ? 'bg-green-600 text-white'
+                  : 'bg-white text-gray-700'
+              }`}
+            >
+              Organization
+            </button>
+            <button
+              onClick={() => setMode('parent')}
+              className={`px-4 py-2 rounded-full border ${
+                mode === 'parent'
+                  ? 'bg-green-600 text-white'
+                  : 'bg-white text-gray-700'
+              }`}
+            >
+              Parent
+            </button>
+          </div>
+
+          {/* Heading */}
           <div className="mb-8">
-            <h2 className="text-3xl font-bold text-gray-800 mb-2">Sign Up</h2>
+            <h2 className="text-3xl font-bold text-gray-800 mb-2">
+              {mode === 'organization' ? 'Organization Sign Up' : 'Parent Sign Up'}
+            </h2>
             <p className="text-gray-500 text-sm">
               Let’s start the journey and make an impact
             </p>
@@ -44,74 +83,96 @@ export default function SignUp() {
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Organization Name */}
-            <div>
-              <label className="block mb-1 text-xs font-semibold text-gray-700 tracking-wide">
-                Organization Name
-              </label>
-              <input
-                name="orgName"
-                type="text"
-                value={form.orgName}
-                onChange={handleChange}
-                placeholder="Your Organization"
-                required
-                className="border border-gray-300 px-4 py-2.5 w-full rounded-lg focus:ring-2 focus:ring-green-400 focus:border-transparent transition-all duration-200"
-              />
-            </div>
+            {mode === 'organization' ? (
+              <>
+                {/* Org Email */}
+                <div>
+                  <label className="block mb-1 text-xs font-semibold text-gray-700">
+                    Email
+                  </label>
+                  <input
+                    name="email"
+                    type="email"
+                    value={orgForm.email}
+                    onChange={handleOrgChange}
+                    placeholder="mail@abc.com"
+                    required
+                    className="border border-gray-300 px-4 py-2.5 w-full rounded-lg"
+                  />
+                </div>
 
-            {/* Email */}
-            <div>
-              <label className="block mb-1 text-xs font-semibold text-gray-700 tracking-wide">
-                Email
-              </label>
-              <input
-                name="email"
-                type="email"
-                value={form.email}
-                onChange={handleChange}
-                placeholder="mail@abc.com"
-                required
-                className="border border-gray-300 px-4 py-2.5 w-full rounded-lg focus:ring-2 focus:ring-green-400 focus:border-transparent transition-all duration-200"
-              />
-            </div>
+                {/* Org Password */}
+                <div>
+                  <label className="block mb-1 text-xs font-semibold text-gray-700">
+                    Set Password
+                  </label>
+                  <input
+                    name="password"
+                    type="password"
+                    value={orgForm.password}
+                    onChange={handleOrgChange}
+                    placeholder="*************"
+                    required
+                    className="border border-gray-300 px-4 py-2.5 w-full rounded-lg"
+                  />
+                </div>
 
-            {/* Set Password */}
-            <div>
-              <label className="block mb-1 text-xs font-semibold text-gray-700 tracking-wide">
-                Set Password
-              </label>
-              <input
-                name="password"
-                type="password"
-                value={form.password}
-                onChange={handleChange}
-                placeholder="*************"
-                required
-                className="border border-gray-300 px-4 py-2.5 w-full rounded-lg focus:ring-2 focus:ring-green-400 focus:border-transparent transition-all duration-200"
-              />
-            </div>
+                {/* Remember Me */}
+                <div className="flex items-center text-sm">
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      name="remember"
+                      checked={orgForm.remember}
+                      onChange={handleOrgChange}
+                      className="accent-green-600"
+                    />
+                    <span className="text-gray-700">Remember Me</span>
+                  </label>
+                </div>
+              </>
+            ) : (
+              <>
+                {/* Parent Email */}
+                <div>
+                  <label className="block mb-1 text-xs font-semibold text-gray-700">
+                    Email
+                  </label>
+                  <input
+                    name="email"
+                    type="email"
+                    value={parentForm.email}
+                    onChange={handleParentChange}
+                    placeholder="parent@mail.com"
+                    required
+                    className="border border-gray-300 px-4 py-2.5 w-full rounded-lg"
+                  />
+                </div>
 
-            {/* Remember Me */}
-            <div className="flex items-center justify-between text-sm">
-              <label className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  name="remember"
-                  checked={form.remember}
-                  onChange={handleChange}
-                  className="accent-green-600"
-                />
-                <span className="text-gray-700">Remember Me</span>
-              </label>
-            </div>
+                {/* Parent Password */}
+                <div>
+                  <label className="block mb-1 text-xs font-semibold text-gray-700">
+                    Set Password
+                  </label>
+                  <input
+                    name="password"
+                    type="password"
+                    value={parentForm.password}
+                    onChange={handleParentChange}
+                    placeholder="*************"
+                    required
+                    className="border border-gray-300 px-4 py-2.5 w-full rounded-lg"
+                  />
+                </div>
+              </>
+            )}
 
-            {/* Submit Button */}
+            {/* Submit */}
             <button
               type="submit"
-              className="w-full bg-green-600 text-white px-4 py-2.5 rounded-lg font-semibold hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2 transition-all duration-200"
+              className="w-full bg-green-600 text-white px-4 py-2.5 rounded-lg font-semibold hover:bg-green-700"
             >
-              Let’s go
+              Let’s Go
             </button>
           </form>
         </div>
