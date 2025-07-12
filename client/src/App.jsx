@@ -27,9 +27,25 @@ export default function App() {
      
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path='/setup' element={<Profile />} />
-        <Route path='/setup1' element={<Profile1 />} />
-        <Route path='/setup2' element={<Profile2 />} />
+        <Route path='/profile' element={
+          
+          <PrivateRoute>
+          <Profile/>
+          </PrivateRoute>
+          
+          } />
+        <Route path='/profile1' element={
+          <PrivateRoute>
+          <Profile1 />
+          </PrivateRoute>
+          } />
+        <Route path='/profile2' element={
+          
+         <PrivateRoute>
+          <Profile2 />
+          </PrivateRoute>
+          
+          } />
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
         <Route path="/profile" element={<Profiles />} />

@@ -9,12 +9,11 @@ exports.protect = (roles = []) => async (req, res, next) => {
   }
 
   const token = authHeader.split(' ')[1];
-  if (!token) {
-    return res.status(401).json({ error: 'No token found.' });
-  }
+  const secret = process.env.JWT_SECRET || 'secret'; // ✅ use correct source
+  console.log('Verifying with secret:', secret); // Optional debug
 
   try {
-    const decoded = jwt.verify(token, global.JWT_SECRET || 'secret');
+    const decoded = jwt.verify(token, secret); // ✅ FIXED LINE
 
     const user = await User.findById(decoded.id).select('-password');
     if (!user) {

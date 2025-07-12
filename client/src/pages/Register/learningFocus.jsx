@@ -1,14 +1,18 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import Image from "../../assets/Group 3.png";
 import Image1 from "../../assets/pngegg 1.png";
 
 const LearningFocus = () => {
+  const navigate = useNavigate();
   const [selectedSubjects, setSelectedSubjects] = useState(['behaviour', 'shapes']);
+  const [loading, setLoading] = useState(false);
 
   const subjects = [
     { id: 'behaviour', label: '😊 Behaviour & Emotion' },
     { id: 'shapes', label: '🧩 Shapes & Thinking' },
-    { id: 'speech', label: '🔊 Speech and Words' }
+    { id: 'speech', label: '🔊 Speech and Words' },
   ];
 
   const toggleSubject = (subjectId) => {
@@ -19,8 +23,38 @@ const LearningFocus = () => {
     );
   };
 
-  const handleNext = () => {
-    console.log('Selected subjects:', selectedSubjects);
+  const handleNext = async () => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('token');
+      const role = localStorage.getItem('role'); // parent | organization | kid
+
+      if (!token) {
+        alert('User not authenticated');
+        return;
+      }
+
+      await axios.patch(
+        'http://localhost:5000/api/auth/preferences',
+        { preferences: selectedSubjects },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      alert('Preferences saved successfully!');
+
+
+        navigate('/profile2');
+      
+    } catch (err) {
+      console.error('Error saving preferences:', err);
+      alert(err.response?.data?.message || 'Something went wrong.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -50,7 +84,7 @@ const LearningFocus = () => {
       </header>
 
       {/* Content */}
-      <main className="flex flex-col md:flex-row max-w-7xl mx-auto w-full px-8 py-12 gap-12 relative md:items-start"> {/* ✅ Changed md:items-center to md:items-start */}
+      <main className="flex flex-col md:flex-row max-w-7xl mx-auto w-full px-8 py-12 gap-12 md:items-start">
         {/* Steps */}
         <div className="hidden md:flex flex-col items-center space-y-4">
           {[1, 2, 3].map((step) => (
@@ -107,9 +141,10 @@ const LearningFocus = () => {
             </div>
             <button
               onClick={handleNext}
+              disabled={loading}
               className="w-full h-12 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-lg transition shadow hover:shadow-lg"
             >
-              NEXT
+              {loading ? 'Saving...' : 'NEXT'}
             </button>
           </div>
         </div>
