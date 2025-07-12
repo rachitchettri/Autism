@@ -1,18 +1,15 @@
 .feature-heading {
-    width: 185.85px;
-    height: 101px;
-  
-    font-family: 'Google Sans', sans-serif;
-    font-style: normal;
-    font-weight: 700;
-    font-size: 19.4899px;
-    line-height: 25px;
-    text-align: center;
-    color: #4D4D4D;
-  
-    flex: none;
-    order: 0;
-    align-self: stretch;
-    flex-grow: 0;
-  }
-  
+  font-family: 'Google Sans', sans-serif;
+  font-weight: 700;
+  font-size: 1.25rem; /* 20px */
+  line-height: 1.5rem; /* 24px */
+  text-align: center;
+  color: #4D4D4D;
+
+  /* Remove fixed width/height */
+  width: 100%;
+  height: auto;
+
+  /* Optional spacing */
+  margin-bottom: 0.5rem;
+}

@@ -4,7 +4,7 @@ import Hero from './Hero'
 import WhyThisMatters from './whyThisMatters'
 import Work from './work'
 import Footer from './footer'
-import JourneyCTA from './journey'
+
 
 const Home = () => {
   return (
@@ -13,7 +13,7 @@ const Home = () => {
     <Hero/>
     <WhyThisMatters/>
     <Work/>
-    <JourneyCTA/>
+ 
     <Footer/>
    
         </div>

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import Autism from '../assets/autism.png'
 
 export default function Profile() {
   const [search, setSearch] = useState('');
@@ -29,7 +30,15 @@ export default function Profile() {
     <div className="w-full flex font-[\'Google Sans\']">
       {/* Sidebar */}
       <aside className="w-64 bg-green-700 text-white flex flex-col p-6 space-y-6 min-h-screen">
-        <h1 className="text-xl font-bold mb-8">UNGA BUNGA</h1>
+      <div className="flex items-center">
+        <a href="/">
+          <img
+            src={Autism}
+            alt="Logo"
+            className="h-14 md:h-24 w-auto object-contain"
+          />
+        </a>
+      </div>
 
         <nav className="flex flex-col gap-4">
           <Link to="/dashboard" className={`px-4 py-2 rounded ${location.pathname === '/dashboard' ? 'bg-green-800' : 'hover:bg-green-600'}`}>Dashboard</Link>

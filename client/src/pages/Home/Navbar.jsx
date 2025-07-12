@@ -1,16 +1,23 @@
 import React from 'react';
+import autismLogo from '../../assets/autism.png';
 
 export default function Navbar() {
   return (
-    <header className="w-full bg-white shadow-sm px-6 py-4 flex items-center justify-between">
+    <header className="w-full bg-white shadow-sm px-6 py-3 md:py-4 flex items-center justify-between">
       
       {/* Logo */}
-      <div className="text-2xl font-bold text-[#16a34a]">
-        LOGO
+      <div className="flex items-center">
+        <a href="/">
+          <img
+            src={autismLogo}
+            alt="Logo"
+            className="h-14 md:h-24 w-auto object-contain"
+          />
+        </a>
       </div>
 
-      {/* Navigation Links */}
-      <nav className="flex items-center justify-end gap-[22.27px]">
+      {/* Navigation */}
+      <nav className="hidden md:flex items-center space-x-6">
         <a href="/" className="text-gray-700 hover:text-[#16a34a] font-medium transition">
           Home
         </a>
