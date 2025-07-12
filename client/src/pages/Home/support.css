@@ -1,0 +1,15 @@
+.landing-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 0;
+    gap: 53px;
+  
+    position: absolute;
+    width: 1002px;
+    height: 672px;
+    left: -5px;
+    top: 908px;
+  }
+  

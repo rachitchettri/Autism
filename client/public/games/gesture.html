@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Hand Gesture Quiz</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    :root {
+      --primary: #4361ee;
+      --success: #4cc9f0;
+      --danger: #f72585;
+      --warning: #f8961e;
+      --dark: #212529;
+      --light: #f8f9fa;
+      --gray: #6c757d;
+    }
+
+    html, body {
+      margin: 0; 
+      padding: 0; 
+      overflow: hidden; 
+      height: 100%;
+      background: #222; 
+      color: white; 
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      user-select: none;
+      touch-action: none;
+    }
+
+    .loading-overlay {
+      position: fixed;
+      top: 0; 
+      left: 0; 
+      width: 100vw; 
+      height: 100vh;
+      background: rgba(0,0,0,0.85);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      font-size: 1.5rem;
+      user-select: none;
+      z-index: 9999;
+      backdrop-filter: blur(5px);
+    }
+
+    .loader {
+      display: flex;
+      margin-bottom: 1.5rem;
+    }
+
+    .loader span {
+      font-weight: bold;
+      font-size: 3.5rem;
+      animation: blink 1.4s infinite ease-in-out both;
+      margin: 0 0.2rem;
+    }
+
+    .loader span:nth-child(1) { animation-delay: 0s; }
+    .loader span:nth-child(2) { animation-delay: 0.2s; }
+    .loader span:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes blink {
+      0%, 80%, 100% { opacity: 0.2; transform: translateY(0); }
+      40% { opacity: 1; transform: translateY(-10px); }
+    }
+
+    .loading-text {
+      margin-top: 1rem;
+      font-weight: 600;
+      text-align: center;
+      max-width: 80%;
+    }
+
+    video, canvas {
+      position: fixed; 
+      top: 0; 
+      left: 0;
+      width: 100vw; 
+      height: 100vh;
+      object-fit: cover; 
+      z-index: 0;
+      transform: scaleX(-1);
+    }
+    
+    canvas { 
+      z-index: 2; 
+      pointer-events: none; 
+    }
+
+    #question-box {
+      position: absolute; 
+      top: 20px; 
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.85); 
+      padding: 15px 25px;
+      border-radius: 15px; 
+      font-size: 1.8rem;
+      z-index: 4; 
+      max-width: 90vw; 
+      text-align: center;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      border: 1px solid rgba(255,255,255,0.1);
+      font-weight: 600;
+      backdrop-filter: blur(5px);
+    }
+
+    #score-box, #timer-box {
+      position: absolute; 
+      right: 20px;
+      background: rgba(255,255,255,0.95);
+      color: black; 
+      padding: 10px 18px;
+      border-radius: 12px; 
+      font-size: 1.1rem;
+      z-index: 4; 
+      user-select: none;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      font-weight: 600;
+    }
+
+    #score-box { 
+      top: 20px; 
+    }
+    
+    #timer-box { 
+      top: 75px; 
+    }
+
+    #balloon-wrapper {
+      position: absolute; 
+      top: 0; 
+      left: 0;
+      width: 100vw; 
+      height: 100vh;
+      transform: scaleX(-1); 
+      pointer-events: none;
+      z-index: 3;
+    }
+
+    .balloon {
+      position: absolute;
+      background: white;
+      border: 2px solid rgba(0,0,0,0.1);
+      border-radius: 24px;
+      padding: 15px 35px;
+      font-size: 1.4rem;
+      font-weight: bold;
+      color: #222;
+      cursor: default;
+      transition: all 0.3s ease;
+      pointer-events: none;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+      white-space: nowrap;
+      transform: scaleX(-1);
+      text-align: center;
+      min-width: 120px;
+      opacity: 0;
+      animation: balloonAppear 0.5s ease-out forwards;
+    }
+
+    @keyframes balloonAppear {
+      from { opacity: 0; transform: scaleX(-1) scale(0.8); }
+      to { opacity: 1; transform: scaleX(-1) scale(1); }
+    }
+
+    .balloon.correct {
+      background: #4cc9f0;
+      color: white;
+      box-shadow: 0 6px 15px rgba(76, 201, 240, 0.4);
+    }
+
+    .balloon.incorrect {
+      background: #f72585;
+      color: white;
+      box-shadow: 0 6px 15px rgba(247, 37, 133, 0.4);
+    }
+
+    .balloon.neutral {
+      background: rgba(255,255,255,0.8);
+    }
+
+    #skip-btn {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255,255,255,0.15);
+      color: white;
+      border: none;
+      padding: 12px 25px;
+      border-radius: 50px;
+      font-size: 1rem;
+      font-weight: 600;
+      z-index: 4;
+      cursor: pointer;
+      backdrop-filter: blur(5px);
+      transition: all 0.2s ease;
+    }
+
+    #skip-btn:hover {
+      background: rgba(255,255,255,0.25);
+    }
+
+    #hand-hint {
+      position: absolute;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: rgba(255,255,255,0.7);
+      font-size: 0.9rem;
+      z-index: 4;
+      text-align: center;
+      background: rgba(0,0,0,0.5);
+      padding: 8px 15px;
+      border-radius: 20px;
+      backdrop-filter: blur(5px);
+    }
+
+    .pulse {
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: translateX(-50%) scale(1); }
+      50% { transform: translateX(-50%) scale(1.05); }
+      100% { transform: translateX(-50%) scale(1); }
+    }
+
+    @media (max-width: 768px) {
+      #question-box {
+        font-size: 1.4rem;
+        padding: 12px 20px;
+        top: 15px;
+      }
+      
+      #score-box, #timer-box {
+        font-size: 1rem;
+        padding: 8px 15px;
+      }
+      
+      #timer-box {
+        top: 70px;
+      }
+      
+      .balloon {
+        font-size: 1.2rem;
+        padding: 12px 25px;
+        min-width: 100px;
+      }
+      
+      #skip-btn {
+        font-size: 0.9rem;
+        padding: 10px 20px;
+      }
+      
+      #hand-hint {
+        bottom: 70px;
+        font-size: 0.8rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <video id="video" autoplay playsinline muted></video>
+  <canvas id="canvas"></canvas>
+  
+  <div id="question-box">Loading quiz...</div>
+  <div id="score-box">Score: 0</div>
+  <div id="timer-box">Time left: 5s</div>
+  <div id="balloon-wrapper"></div>
+  
+  <button id="skip-btn" class="pulse">Skip Question</button>
+  <div id="hand-hint">Pinch a balloon to select answer</div>
+  
+  <div id="loading-overlay" class="loading-overlay" style="display:none;">
+    <div class="loader">
+      <span>.</span><span>.</span><span>.</span>
+    </div>
+    <div class="loading-text">Preparing your detailed analysis</div>
+  </div>
+
+  <!-- MediaPipe Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+
+  <!-- Django passes quizId -->
+  <script>
+    // Instead of this:
+    // const quizId = "{ quiz_id }";
+  
+    // Use this if you're using Django and rendering quiz_id into the template:
+    const quizId = "{{ quiz_id|escapejs }}";
+  
+    const pathParts = window.location.pathname.split("/");
+    const quizType = pathParts[4]; // should still work as intended
+  </script>
+
+  <script>
+  // Configuration
+  const CONFIG = {
+    HAND_CONNECTIONS: [
+      [0,1],[1,2],[2,3],[3,4],
+      [0,5],[5,6],[6,7],[7,8],
+      [5,9],[9,10],[10,11],[11,12],
+      [9,13],[13,14],[14,15],[15,16],
+      [13,17],[0,17],[17,18],[18,19],[19,20]
+    ],
+    BASE_TIME_PER_QUESTION: 5,
+    MIN_SPEED: 0.5,
+    MAX_SPEED: 4,
+    SPEED_CHANGE: 0.25,
+    SELECTION_RADIUS: 90,
+    GRAB_COOLDOWN: 1000,
+    INITIAL_BALLOON_SPEED: 1.5,
+    BALLOON_MIN_DISTANCE: 150,
+    BALLOON_REPULSION: 0.8,
+    BALLOON_DRIFT_VARIATION: 0.4,
+    BALLOON_SCREEN_MARGIN: 80,
+    BALLOON_INITIAL_HEIGHT: 200
+  };
+
+  // Quiz State
+  const state = {
+    questions: [],
+    questionOrder: [],
+    currentQuestionIndex: 0,
+    score: 0,
+    answered: false,
+    timer: null,
+    timeLeft: CONFIG.BASE_TIME_PER_QUESTION,
+    balloonSpeed: CONFIG.INITIAL_BALLOON_SPEED,
+    resultsLog: [],
+    balloons: [],
+    balloonPositions: [],
+    lastGrabTime: 0
+  };
+
+  // DOM Elements
+  const elements = {
+    video: document.getElementById('video'),
+    canvas: document.getElementById('canvas'),
+    ctx: document.getElementById('canvas').getContext('2d'),
+    questionBox: document.getElementById('question-box'),
+    scoreBox: document.getElementById('score-box'),
+    timerBox: document.getElementById('timer-box'),
+    balloonWrapper: document.getElementById('balloon-wrapper'),
+    loadingOverlay: document.getElementById('loading-overlay'),
+    skipBtn: document.getElementById('skip-btn'),
+    handHint: document.getElementById('hand-hint')
+  };
+
+  // Initialize the application
+  function init() {
+    setupEventListeners();
+    resizeCanvas();
+    startCameraAndQuiz();
+  }
+
+  // Set up event listeners
+  function setupEventListeners() {
+    window.addEventListener('resize', resizeCanvas);
+    elements.skipBtn.addEventListener('click', skipQuestion);
+  }
+
+  // Resize canvas to full window
+  function resizeCanvas() {
+    elements.canvas.width = window.innerWidth;
+    elements.canvas.height = window.innerHeight;
+  }
+
+  // Shuffle array helper
+  function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+  }
+
+  // Remove duplicates but keep only one correct answer
+  function uniqueAnswers(answers, correctAnswer) {
+    const seen = new Set();
+    const unique = [];
+
+    for (const ans of answers) {
+      if (ans === correctAnswer) {
+        // Add correct answer only once
+        if (!seen.has(correctAnswer)) {
+          unique.push(ans);
+          seen.add(correctAnswer);
+        }
+      } else {
+        if (!seen.has(ans)) {
+          unique.push(ans);
+          seen.add(ans);
+        }
+      }
+    }
+    return unique;
+  }
+
+  // Load quiz from backend
+  async function loadQuiz() {
+    try {
+      const res = await fetch(`/api/quiz/${quizId}/`);
+      if (!res.ok) throw new Error("HTTP status " + res.status);
+      const data = await res.json();
+
+      state.questions = shuffleArray(data.questions).slice(0, 10);
+      state.questionOrder = state.questions.map((_, i) => i);
+      shuffleArray(state.questionOrder);
+
+      showQuestion(0);
+      runTimer();
+    } catch (error) {
+      console.error("Failed to load quiz:", error);
+      elements.questionBox.textContent = "Failed to load quiz. Please refresh.";
+    }
+  }
+  // Create balloon elements for answers
+  function createBalloons(answers) {
+    elements.balloonWrapper.innerHTML = '';
+    state.balloons = [];
+
+    answers.forEach((answer, i) => {
+      const balloon = document.createElement('div');
+      balloon.className = 'balloon neutral';
+      balloon.textContent = answer;
+      balloon.style.animationDelay = `${i * 0.1}s`;
+      elements.balloonWrapper.appendChild(balloon);
+      state.balloons.push(balloon);
+    });
+  }
+
+  // Initialize balloon positions
+  function initBalloonPositions() {
+    state.balloonPositions = [];
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+
+    const positions = [];
+    const maxAttempts = 50;
+
+    for (let i = 0; i < state.balloons.length; i++) {
+      let validPosition = false;
+      let attempts = 0;
+      let x, y;
+
+      while (!validPosition && attempts < maxAttempts) {
+        attempts++;
+        x = Math.random() * (width - 2 * CONFIG.BALLOON_SCREEN_MARGIN) + CONFIG.BALLOON_SCREEN_MARGIN;
+        y = Math.random() * CONFIG.BALLOON_INITIAL_HEIGHT + 50;
+        validPosition = true;
+
+        for (const pos of positions) {
+          const dx = pos.left - x;
+          const dy = pos.bottom - y;
+          if (Math.sqrt(dx * dx + dy * dy) < CONFIG.BALLOON_MIN_DISTANCE) {
+            validPosition = false;
+            break;
+          }
+        }
+      }
+
+      positions.push({
+        left: x,
+        bottom: y,
+        drift: (Math.random() * 2 - 1) * CONFIG.BALLOON_DRIFT_VARIATION,
+        width: state.balloons[i].offsetWidth,
+        height: state.balloons[i].offsetHeight
+      });
+    }
+
+    state.balloonPositions = positions;
+  }
+
+  // Show current question
+  function showQuestion(index) {
+    state.answered = false;
+    state.timeLeft = CONFIG.BASE_TIME_PER_QUESTION;
+    updateTimer();
+
+    const question = state.questions[state.questionOrder[index]];
+    elements.questionBox.textContent = question.question;
+
+    // Remove duplicates and ensure only one correct answer in options
+    const uniqueAns = uniqueAnswers(question.answers, question.correct);
+    const shuffledAnswers = shuffleArray(uniqueAns);
+    createBalloons(shuffledAnswers);
+    initBalloonPositions();
+  }
+
+  // Update score display
+  function updateScore() {
+    if (elements.scoreBox.textContent !== `Score: ${state.score}`) {
+  elements.scoreBox.textContent = `Score: ${state.score}`;
+}
+  }
+
+  // Update timer display
+  function updateTimer() {
+    const newText = `Time left: ${state.timeLeft}s`;
+if (elements.timerBox.textContent !== newText) {
+  elements.timerBox.textContent = newText;
+}
+    
+
+    if (state.timeLeft <= 3) {
+      elements.timerBox.style.color = 'white';
+      elements.timerBox.style.backgroundColor = '#f72585';
+      elements.timerBox.classList.add('pulse');
+    } else {
+      elements.timerBox.style.color = 'black';
+      elements.timerBox.style.backgroundColor = 'rgba(255,255,255,0.95)';
+      elements.timerBox.classList.remove('pulse');
+    }
+  }
+
+  // Handle answer selection
+  function handleAnswer(selectedAnswer) {
+    if (state.answered) return;
+    state.answered = true;
+
+    clearInterval(state.timer);
+
+    const question = state.questions[state.questionOrder[state.currentQuestionIndex]];
+    const isCorrect = (selectedAnswer === question.correct);
+
+    if (isCorrect) {
+      state.score++;
+      state.balloonSpeed = Math.min(state.balloonSpeed + CONFIG.SPEED_CHANGE, CONFIG.MAX_SPEED);
+    } else {
+      state.balloonSpeed = Math.max(state.balloonSpeed - CONFIG.SPEED_CHANGE, CONFIG.MIN_SPEED);
+    }
+
+    updateScore();
+
+    state.balloons.forEach(balloon => {
+      if (balloon.textContent === question.correct) {
+        balloon.classList.remove('neutral');
+        balloon.classList.add('correct');
+      } else if (balloon.textContent === selectedAnswer) {
+        balloon.classList.remove('neutral');
+        balloon.classList.add('incorrect');
+      }
+    });
+
+    state.resultsLog.push({
+      question: question.question,
+      selectedAnswer: selectedAnswer,
+      correctAnswer: question.correct,
+      isCorrect: isCorrect,
+      timeTaken: CONFIG.BASE_TIME_PER_QUESTION - state.timeLeft
+    });
+
+    setTimeout(nextQuestion, 1500);
+  }
+
+  // Skip current question
+  function skipQuestion() {
+    if (state.answered) return;
+    state.answered = true;
+
+    clearInterval(state.timer);
+
+    const question = state.questions[state.questionOrder[state.currentQuestionIndex]];
+
+    state.resultsLog.push({
+      question: question.question,
+      selectedAnswer: null,
+      correctAnswer: question.correct,
+      isCorrect: false,
+      timeTaken: CONFIG.BASE_TIME_PER_QUESTION
+    });
+
+    nextQuestion();
+  }
+
+  // Move to next question or finish quiz
+  function nextQuestion() {
+    state.currentQuestionIndex++;
+
+    if (state.currentQuestionIndex >= state.questions.length) {
+      finishQuiz();
+    } else {
+      showQuestion(state.currentQuestionIndex);
+      runTimer();
+    }
+  }
+
+  // Finish quiz and submit results
+  function finishQuiz() {
+    showLoading();
+    if (elements.video.srcObject) {
+  elements.video.srcObject.getTracks().forEach(track => track.stop());
+}
+
+    fetch('/api/save-result/', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        quiz_id: quizId,
+        score: state.score,
+        total: state.questions.length,
+        answers: state.resultsLog
+      })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.result_id) {
+        setTimeout(() => {
+          window.location.href = `/quiz/${quizId}/analysis/?result_id=${data.result_id}&type=${quizType}`;
+        }, 1000);
+      } else {
+        hideLoading();
+        alert("❌ Failed to save results. Please try again.");
+      }
+    })
+    .catch(() => {
+      hideLoading();
+      alert("❌ Network error. Please check your connection.");
+    });
+  }
+
+  // Timer countdown
+  function runTimer() {
+    state.timeLeft = CONFIG.BASE_TIME_PER_QUESTION;
+    updateTimer();
+
+    state.timer = setInterval(() => {
+      state.timeLeft--;
+      updateTimer();
+
+      if (state.timeLeft <= 0) {
+        skipQuestion();
+      }
+    }, 1000);
+  }
+
+  function animateBalloons() {
+    if (state.answered) {
+      requestAnimationFrame(animateBalloons);
+      return;
+    }
+
+    let allOffscreen = true;
+    const screenWidth = window.innerWidth;
+    const screenHeight = window.innerHeight;
+
+    state.balloons.forEach((balloon, i) => {
+      const pos = state.balloonPositions[i];
+
+      pos.bottom += state.balloonSpeed;
+      pos.left += pos.drift;
+
+      if (pos.left < CONFIG.BALLOON_SCREEN_MARGIN) {
+        pos.left = CONFIG.BALLOON_SCREEN_MARGIN;
+        pos.drift = Math.abs(pos.drift) * 0.7;
+      }
+      else if (pos.left > screenWidth - CONFIG.BALLOON_SCREEN_MARGIN - pos.width) {
+        pos.left = screenWidth - CONFIG.BALLOON_SCREEN_MARGIN - pos.width;
+        pos.drift = -Math.abs(pos.drift) * 0.7;
+      }
+    });
+
+    resolveBalloonCollisions();
+
+    state.balloons.forEach((balloon, i) => {
+      const pos = state.balloonPositions[i];
+      const topPx = screenHeight - pos.bottom;
+
+      balloon.style.left = `${pos.left}px`;
+      balloon.style.top = `${topPx}px`;
+
+      if (topPx + pos.height > 0) {
+        allOffscreen = false;
+      }
+    });
+
+    if (allOffscreen) {
+      skipQuestion();
+    }
+
+    requestAnimationFrame(animateBalloons);
+  }
+
+  function resolveBalloonCollisions() {
+    for (let i = 0; i < state.balloonPositions.length; i++) {
+      for (let j = i + 1; j < state.balloonPositions.length; j++) {
+        const pos1 = state.balloonPositions[i];
+        const pos2 = state.balloonPositions[j];
+
+        const dx = pos1.left + pos1.width / 2 - (pos2.left + pos2.width / 2);
+        const dy = (pos1.bottom - pos1.height / 2) - (pos2.bottom - pos2.height / 2);
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        const minDistance = (pos1.width + pos2.width) * 0.6;
+
+        if (distance < minDistance) {
+          const overlap = minDistance - distance;
+          const angle = Math.atan2(dy, dx);
+
+          const displaceX = Math.cos(angle) * overlap * 0.5 * CONFIG.BALLOON_REPULSION;
+          const displaceY = Math.sin(angle) * overlap * 0.5 * CONFIG.BALLOON_REPULSION;
+
+          pos1.left += displaceX;
+          pos2.left -= displaceX;
+          pos1.bottom -= displaceY;
+          pos2.bottom += displaceY;
+
+          pos1.drift = displaceX * 0.1;
+          pos2.drift = -displaceX * 0.1;
+        }
+      }
+    }
+  }
+
+  // Hand grab detection
+  function isGrab(landmarks) {
+    const dx = landmarks[4].x - landmarks[8].x;
+    const dy = landmarks[4].y - landmarks[8].y;
+    return Math.sqrt(dx * dx + dy * dy) < 0.07;
+  }
+
+  // Draw hand landmarks and connections
+  function drawHand(landmarks) {
+    elements.ctx.clearRect(0, 0, elements.canvas.width, elements.canvas.height);
+
+    if (!landmarks) return;
+
+    elements.ctx.save();
+    elements.ctx.scale(-1, 1);
+    elements.ctx.translate(-elements.canvas.width, 0);
+
+    elements.ctx.strokeStyle = 'rgba(100, 255, 100, 0.8)';
+    elements.ctx.lineWidth = 4;
+    CONFIG.HAND_CONNECTIONS.forEach(([i, j]) => {
+      const a = landmarks[i];
+      const b = landmarks[j];
+      elements.ctx.beginPath();
+      elements.ctx.moveTo((1 - a.x) * elements.canvas.width, a.y * elements.canvas.height);
+      elements.ctx.lineTo((1 - b.x) * elements.canvas.width, b.y * elements.canvas.height);
+      elements.ctx.stroke();
+    });
+
+    elements.ctx.fillStyle = 'rgba(255, 50, 50, 0.8)';
+    landmarks.forEach(p => {
+      elements.ctx.beginPath();
+      elements.ctx.arc(
+        (1 - p.x) * elements.canvas.width,
+        p.y * elements.canvas.height,
+        6, 0, 2 * Math.PI
+      );
+      elements.ctx.fill();
+    });
+
+    elements.ctx.restore();
+  }
+
+  // MediaPipe results handler
+  function onResults(results) {
+    if (!results.multiHandLandmarks || results.multiHandLandmarks.length === 0) {
+      elements.ctx.clearRect(0, 0, elements.canvas.width, elements.canvas.height);
+      return;
+    }
+
+    const landmarks = results.multiHandLandmarks[0];
+    drawHand(landmarks);
+
+    if (isGrab(landmarks)) {
+      const now = Date.now();
+      if (now - state.lastGrabTime > CONFIG.GRAB_COOLDOWN) {
+        const fingertip = landmarks[8];
+        const tipX = elements.canvas.width - (fingertip.x * elements.canvas.width);
+        const tipY = fingertip.y * elements.canvas.height;
+
+        for (const balloon of state.balloons) {
+          const rect = balloon.getBoundingClientRect();
+          const balloonCenterX = rect.left + rect.width / 2;
+          const balloonCenterY = rect.top + rect.height / 2;
+
+          const dist = Math.hypot(tipX - balloonCenterX, tipY - balloonCenterY);
+          if (dist < CONFIG.SELECTION_RADIUS) {
+            handleAnswer(balloon.textContent);
+            state.lastGrabTime = now;
+            break;
+          }
+        }
+      }
+    }
+  }
+
+  // Show loading overlay
+  function showLoading() {
+    elements.loadingOverlay.style.display = 'flex';
+  }
+
+  // Hide loading overlay
+  function hideLoading() {
+    elements.loadingOverlay.style.display = 'none';
+  }
+
+  // Start camera and initialize quiz
+  async function startCameraAndQuiz() {
+    try {
+      await startCamera();
+      initializeMediaPipe();
+      await loadQuiz();
+      animateBalloons();
+    } catch (error) {
+      console.error("Initialization error:", error);
+      elements.questionBox.textContent = "Error initializing camera. Please check permissions.";
+    }
+  }
+
+  // Start camera stream
+  async function startCamera() {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: {
+        facingMode: 'user',
+        width: { ideal: 1280 },
+        height: { ideal: 720 }
+      },
+      audio: false
+    });
+    elements.video.srcObject = stream;
+    return new Promise((resolve) => {
+      elements.video.onplaying = resolve;
+    });
+  }
+
+  // Initialize MediaPipe Hands
+  function initializeMediaPipe() {
+    const hands = new Hands({
+      locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
+    });
+
+    hands.setOptions({
+      maxNumHands: 1,
+      modelComplexity: 1,
+      minDetectionConfidence: 0.7,
+      minTrackingConfidence: 0.7
+    });
+
+    hands.onResults(onResults);
+
+    const camera = new Camera(elements.video, {
+      onFrame: async () => {
+        await hands.send({ image: elements.video });
+      },
+      width: 640,
+      height: 480
+    });
+
+    camera.start();
+  }
+
+  window.addEventListener('DOMContentLoaded', init);
+</script>
+
+</body>
+</html>

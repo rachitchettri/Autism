@@ -1,17 +1,19 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import Navbar from './components/Navbar';
-import Home from './pages/Home';
+
+import Home from './pages/Home/Home';
 import Register from './pages/Register';
 import Login from './pages/Login';
 import Dashboard from './components/Dashboard';
-import GamesLibrary from './components/GameLibrary';
-import Community from './pages/Community';
-import AdminPanel from './pages/AdminPanel';
+import ABCD from '../public/games/abc';
+
 import Scores from './components/gamescore';
 import Profile from './pages/Register/OnboardingPage';
 import Profile1 from './pages/Register/learningFocus';
 import Profile2  from './pages/Register/lastreg';
 import Profiles from './pages/UserProfile';
+import ShapesGame from '../public/games/Shape';
+import BehaviourGame from '../public/games/EmotionMatchingGame';
+import PronounceGame from '../public/games/pronounce';
 // Example auth check — replace with your real logic!
 const isAuthenticated = () => {
   return !!localStorage.getItem('token'); // or your auth state
@@ -27,6 +29,11 @@ export default function App() {
      
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/games/shapes" element={<ShapesGame />} />
+        <Route path="/games/behaviour" element={<BehaviourGame />} />
+        <Route path="/games/pronounce" element={<PronounceGame />} />
+        <Route path="/games/abcd" element={<ABCD />} />
+     
         <Route path='/profile' element={
           
           <PrivateRoute>
@@ -60,30 +67,9 @@ export default function App() {
             </>
           }
         />
-        <Route
-          path="/games"
-          element={
-            <PrivateRoute>
-              <GamesLibrary />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/community"
-          element={
-            <PrivateRoute>
-              <Community />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/admin"
-          element={
-            <PrivateRoute>
-              <AdminPanel />
-            </PrivateRoute>
-          }
-        />
+       
+      
+       
          <Route
           path="/score"
           element={
