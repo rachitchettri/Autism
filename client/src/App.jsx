@@ -11,6 +11,7 @@ import Scores from './components/gamescore';
 import Profile from './pages/Register/OnboardingPage';
 import Profile1 from './pages/Register/learningFocus';
 import Profile2  from './pages/Register/lastreg';
+import Profiles from './pages/UserProfile';
 // Example auth check — replace with your real logic!
 const isAuthenticated = () => {
   return !!localStorage.getItem('token'); // or your auth state
@@ -26,19 +27,21 @@ export default function App() {
      
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path='/profile' element={<Profile />} />
-        <Route path='/profile1' element={<Profile1 />} />
-        <Route path='/profile2' element={<Profile2 />} />
+        <Route path='/setup' element={<Profile />} />
+        <Route path='/setup1' element={<Profile1 />} />
+        <Route path='/setup2' element={<Profile2 />} />
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/profile" element={<Profiles />} />
+      
 
         {/* Protected Routes */}
         <Route
           path="/dashboard"
           element={
-            <PrivateRoute>
+            <>
               <Dashboard />
-            </PrivateRoute>
+            </>
           }
         />
         <Route
