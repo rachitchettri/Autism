@@ -92,15 +92,15 @@ export default function ABCGame() {
   const q = questions[current];
 
   return (
-    <div
-      style={{
-        fontFamily: "'Comic Sans MS', cursive, sans-serif",
-        background: "linear-gradient(135deg, #a1c4fd, #c2e9fb)",
-        padding: "40px",
-        textAlign: "center",
-        minHeight: "100vh",
-      }}
-    >
+<div
+  style={{
+    fontFamily: "'Comic Sans MS', cursive, sans-serif",
+    background: "#ffffff", // ⬅️ Changed from gradient to white
+    padding: "40px",
+    textAlign: "center",
+    minHeight: "100vh",
+  }}
+>
       <h1 style={{ fontSize: "2.5em", color: "#333" }}>Drag the Word into the Blank!</h1>
 
       {current < questions.length ? (

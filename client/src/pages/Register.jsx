@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { register } from '../api'; // ✅ use your custom API instance
 import SignUpImage from '../assets/P.png';
 
@@ -135,6 +135,19 @@ export default function SignUp() {
               Let’s Go
             </button>
           </form>
+
+          {/* Already have an account? */}
+          <div className="mt-4 text-center">
+            <p className="text-sm text-gray-600">
+              Already have an account?{" "}
+              <Link
+                to="/login"
+                className="text-green-600 font-semibold hover:underline"
+              >
+                Login
+              </Link>
+            </p>
+          </div>
         </div>
       </div>
 

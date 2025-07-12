@@ -363,7 +363,6 @@ const Sidebar = () => {
   const gameItems = [
     { path: '/games/behaviour', name: 'Behaviour', icon: Brain, color: 'text-blue-400' },
     { path: '/games/pronounce', name: 'Speech', icon: MessageCircle, color: 'text-green-400' },
-    { path: '/games/shapes', name: 'Shapes', icon: Shapes, color: 'text-purple-400' },
     { path: '/games/abcd', name: 'ABCD Words', icon: Type, color: 'text-orange-400' }
   ];
 
