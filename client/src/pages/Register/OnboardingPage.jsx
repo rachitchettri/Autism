@@ -160,9 +160,12 @@ import { ChevronDown } from 'lucide-react';
 import axios from 'axios';
 import Image1 from '../../assets/pngegg 1.png';
 import Image from '../../assets/Group 3.png';
+import { useNavigate } from 'react-router-dom';
+
 
 const ChildRegistrationForm = () => {
   const [role, setRole] = useState('parent'); // Default role
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     f_name: '',
     l_name: '',
@@ -212,6 +215,7 @@ const ChildRegistrationForm = () => {
       alert('Profile updated successfully!');
       console.log(res.data);
       // Proceed to next step
+      navigate('/profile1')
     } catch (err) {
       console.error('Profile update error:', err);
       alert(err.response?.data?.message || 'Something went wrong.');

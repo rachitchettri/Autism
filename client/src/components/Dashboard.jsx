@@ -66,7 +66,7 @@ export default function Dashboard() {
         <nav className="flex flex-col gap-4">
           <Link to="/dashboard" className="hover:bg-green-600 px-4 py-2 rounded">Dashboard</Link>
           <Link to="/progress" className="hover:bg-green-600 px-4 py-2 rounded">Progress Tracking</Link>
-          <Link to="/profile" className="hover:bg-green-600 px-4 py-2 rounded">Profiles</Link>
+          <Link to="/users" className="hover:bg-green-600 px-4 py-2 rounded">Profiles</Link>
           <Link to="/settings" className="hover:bg-green-600 px-4 py-2 rounded">Settings</Link>
           
         </nav>

@@ -3,6 +3,8 @@ const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const cors = require('cors'); // ✅ Import cors
 const authRoutes = require('./routes/auth');
+const kidRoutes = require('./routes/kid');
+
 
 dotenv.config();
 const app = express();
@@ -14,6 +16,7 @@ app.use(cors({
 }));
 
 app.use(express.json());
+app.use('/api/kids', kidRoutes);
 
 // Connect MongoDB
 mongoose.connect(process.env.MONGO_URI)

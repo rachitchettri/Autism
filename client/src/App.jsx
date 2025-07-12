@@ -53,6 +53,13 @@ export default function App() {
           </PrivateRoute>
           
           } />
+        <Route path='/users' element={
+          
+         <PrivateRoute>
+          <Profiles />
+          </PrivateRoute>
+          
+          } />
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
         <Route path="/profile" element={<Profiles />} />
