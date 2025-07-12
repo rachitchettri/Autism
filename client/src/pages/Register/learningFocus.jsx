@@ -59,10 +59,7 @@ const LearningFocus = () => {
 
   return (
     <div className="min-h-screen bg-white font-sans flex flex-col">
-      {/* Nav Bar */}
-      <nav className="fixed top-0 left-0 w-full h-16 bg-white shadow-sm z-20 flex items-center px-8">
-        <div className="text-2xl font-bold text-gray-900">LOGO</div>
-      </nav>
+
 
       {/* Header */}
       <header className="pt-16 w-full bg-gradient-to-r from-[#60BC64] to-[#10723A] py-10 px-8 flex flex-col md:flex-row items-center justify-between">

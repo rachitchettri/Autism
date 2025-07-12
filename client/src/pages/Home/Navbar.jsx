@@ -11,7 +11,7 @@ export default function Navbar() {
           <img
             src={autismLogo}
             alt="Logo"
-            className="h-14 md:h-24 w-auto object-contain"
+            className="h-9 md:h-15 w-auto object-contain"
           />
         </a>
       </div>

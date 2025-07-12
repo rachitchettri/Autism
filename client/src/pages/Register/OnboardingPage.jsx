@@ -224,10 +224,6 @@ const ChildRegistrationForm = () => {
 
   return (
     <div className="min-h-screen w-full bg-white flex flex-col font-poppins">
-      {/* Navbar */}
-      <nav className="fixed top-0 left-0 w-full h-16 bg-white shadow-sm z-20 flex items-center px-8">
-        <span className="text-xl font-semibold text-black">LOGO</span>
-      </nav>
 
       {/* Header */}
       <header className="pt-16 w-full bg-gradient-to-r from-[#60BC64] to-[#10723A] py-12 px-8 flex flex-col md:flex-row items-center justify-between">

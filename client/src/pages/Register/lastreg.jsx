@@ -293,10 +293,7 @@ export default function ReviewFinish() {
 
   return (
     <div className="min-h-screen bg-white font-sans flex flex-col">
-      {/* Nav */}
-      <nav className="w-full h-16 flex items-center px-8 shadow-sm">
-        <div className="text-black font-semibold text-xl font-poppins">LOGO</div>
-      </nav>
+      
 
       {/* Header */}
       <header className="w-full bg-gradient-to-r from-[#60BC64] to-[#10723A] px-8 py-10 flex flex-col md:flex-row items-center justify-between">
